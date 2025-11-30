@@ -1,0 +1,3 @@
+chromadb
+ollama
+duckduckgo-search

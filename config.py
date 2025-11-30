@@ -1,0 +1,1 @@
+TAVILY_API_KEY = "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"
