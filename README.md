@@ -52,7 +52,6 @@ Those systems will be added in future iterations.
 ---
 
 ## License! 
-[License](https://img.shields.io/badge/License-NRL--1.0-red)
 
 This repository is protected under the **Custom Restricted License (CRL-1.0)**.  
 Use, modification, execution, or redistribution of the code is **prohibited** without  
