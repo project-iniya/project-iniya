@@ -1,6 +1,6 @@
-# 🧠 Iniya AI — Personal Autonomous Assistant (Early Prototype)
+#  Iniya AI — Personal Autonomous Assistant (Early Prototype)
 
-### 🚧 Status: In Early Development
+###  Status: In Early Development
 
 This project is an experimental attempt to build a **fully autonomous AI personal assistant** — one that, in the future, may be capable of interacting with the physical world, rendering holographic objects, and functioning as a real-world companion system.
 
@@ -15,7 +15,7 @@ The goal is not just to make another chatbot — but to create a **long-term sca
 
 ---
 
-## 🌟 Vision (Long-Term Goals)
+##  Vision (Long-Term Goals)
 
 - 🗣️ Natural human-level interaction  
 - 🎭 Personality and emotion simulation  
@@ -28,7 +28,7 @@ This is **not just software — it's a platform in progress.**
 
 ---
 
-## 📍 Current Stage
+##  Current Stage
 
 ✔ AI reasoning engine (foundation)  
 ✔ Prompt framework and architecture  
@@ -42,7 +42,7 @@ Those systems will be added in future iterations.
 
 ---
 
-## 🏗️ Tech Stack (Current)
+##  Tech Stack (Current)
 
 - Python
 - Large Language Model logic and assistant framework
