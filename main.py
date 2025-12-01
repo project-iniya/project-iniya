@@ -1,4 +1,6 @@
 from AI_Model.agent import BrainAgent
+#from Audio.elevenlabs_tts import speak
+from Audio.silero_tts import speak, list_voices
 import time
 
 agent = BrainAgent()
@@ -16,7 +18,8 @@ def chat_loop():
 
         end_time = time.perf_counter()     # ⏱ End timing
         elapsed = end_time - start_time
-        
+
+        speak(reply["text"])
         print(f"Iniya: {reply}")
         print(f"⏱ Response time: {elapsed:.2f} seconds\n")  # formatted result
 

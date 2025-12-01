@@ -15,6 +15,15 @@ The goal is not just to make another chatbot — but to create a **long-term sca
 
 ---
 
+##  Software Requirments
+
+- Python 3.13 (Anaconda Python used for Development)
+- ffmpeg, mpv for Audio
+- Nvidia GPU with Cuda for offline ollama models
+- Ollama Cloud model also available (requires messing with llm_wrapper.py for now to enable)
+
+---
+
 ##  Vision (Long-Term Goals)
 
 - 🗣️ Natural human-level interaction  
@@ -33,6 +42,7 @@ This is **not just software — it's a platform in progress.**
 ✔ AI reasoning engine (foundation)  
 ✔ Prompt framework and architecture  
 ✔ Experimental memory layer  
+✔ Voice TTS Added(only the TTS Scripts and Models , No integration)
 
 ❌ Voice interface  
 ❌ Physical holographic output  
@@ -45,9 +55,17 @@ Those systems will be added in future iterations.
 ##  Tech Stack (Current)
 
 - Python
-- Large Language Model logic and assistant framework
+- Large Language Model logic and assistant framework using Ollama
 - Memory and context handling modules
 - Modular architecture for future expansion
+
+---
+
+## Audio Stack (Current, TTS Only)
+
+- Main Audio TTS interface is Elevenlabs API with its Flash v2.5 Model
+- secondary offline TTS is Silero TTS with its en_v5 TTS Model
+- Audio Play using mpv through subprocess module
 
 ---
 

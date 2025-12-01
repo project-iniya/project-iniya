@@ -3,19 +3,38 @@ from .memory_vector import store_message, search_relevant, delete_vector_memory
 from .personality import PERSONALITY, ASSISTANT_NAME
 from .llm_wrapper import ask_model
 from .tools import TOOLS, parse_tool_call
+import re
 
 DEBUG = True
+
+#===== Functions =====
 
 def log(msg):
     if DEBUG:
         print(f"[AGENT] {msg}")
 
 
+def extract_keywords(text):
+    words = re.findall(r'\b[a-zA-Z]+\b', text.lower())
+    common = {"and","or","the","is","my","your","of","to","with","in","on","for"}
+    keywords = [w for w in words if w not in common and len(w) > 3]
+    return list(set(keywords))[:6]
+
+def clean_response(text: str):
+    text = text.strip()
+
+    # Remove duplicate assistant prefix if present
+    if text.lower().startswith(ASSISTANT_NAME.lower()):
+        text = text[len(ASSISTANT_NAME):].strip(" :,-")
+
+    return text
+
 class BrainAgent:
 
     def __init__(self):
         log("Initializing agent...")
         self.static_memory = load_static_memory()
+        self.history = []
 
     # ---------------- Preference Command ----------------
     def detect_preference_command(self, text: str):
@@ -67,20 +86,11 @@ class BrainAgent:
           == MEMORY SEARCH ==
           {mem_text}
 
-          TOOL EXECUTION RULES:
-          -----------------------------------
-          - You NEVER execute tasks yourself.
-          - If the user asks for something that can be handled by a tool, you MUST return ONLY a JSON tool call.
+          TOOL RULES:
+          - Call a tool ONLY when the user explicitly asks to add, search, list, or complete something.
+          - If calling a tool, respond ONLY with valid JSON: {{"action":"<name>","input":"<value>"}} 
+          - After a tool runs, respond normally and do NOT call another tool unless requested again.
 
-          FORMAT MUST BE:
-          {{"action": "<tool_name>", "input": "<arguments>"}}
-
-          - DO NOT reply with text, explanations, confirmations, or polite responses.
-          - DO NOT assume the tool ran automatically.
-          - DO NOT mark tasks as complete yourself — ONLY the tool does that.
-          - After a tool result is returned to you, THEN you may respond naturally.
-
-          If unsure whether a tool applies, ALWAYS default to calling one.
           -----------------------------------
           """
 
@@ -111,7 +121,9 @@ class BrainAgent:
 
         # ==== LLM Response ====
         system_prompt = self.build_prompt(user_input)
-        reply = ask_model(system_prompt, user_input)
+        self.history.append({"role": "user", "content": user_input})
+        reply = ask_model(system_prompt, self.history)
+        self.history.append({"role": "assistant", "content": reply})
 
         action, tool_input = parse_tool_call(reply)
 
@@ -124,22 +136,34 @@ class BrainAgent:
 
             result = TOOLS[action](tool_input)
 
-            # Correct follow-up format to prevent new tool invocation
-            tool_message = {
+            # Add tool execution into history
+            self.history.append({
                 "role": "tool",
-                "name": action,
-                "content": str(result)
-            }
+                "content": f"{action} → {result}"
+            })
 
-            # Now ask the model to continue the conversation
-            final = ask_model(system_prompt, tool_message)
+            # Ask model to continue normally
+            final = ask_model(system_prompt, [
+                *self.history,
+                {"role": "user", "content": "The tool has completed. Respond normally, do NOT call another tool."}
+            ])
 
-            store_message(f"RESULT: {result}")
-            store_message(f"{ASSISTANT_NAME}:{final}")
-
-            return f"{ASSISTANT_NAME}: {final}"
+            self.history.append({"role": "assistant", "content": final})
+            return {
+                "assistant": ASSISTANT_NAME,
+                "text": final,
+                "keywords": extract_keywords(final),
+                "speak": True   # used for future audio mode
+              }
 
         # ==== Normal Chat ====
         store_message(f"USER:{user_input}")
         store_message(f"{ASSISTANT_NAME}:{reply}")
-        return reply
+        final_response = clean_response(reply)
+
+        return {
+            "assistant": ASSISTANT_NAME,
+            "text": final_response,
+            "keywords": extract_keywords(final_response),
+            "speak": True   # used for future audio mode
+          }

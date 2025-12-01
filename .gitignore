@@ -2,3 +2,5 @@ AI_Model/memory/
 __pycache__/
 AI_Model/__pycache__/
 .env
+skip
+temp/
