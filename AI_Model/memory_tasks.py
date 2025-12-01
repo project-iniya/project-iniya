@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime
+from difflib import SequenceMatcher
 
 TASKS_FILE = "AI_Model/memory/tasks_memory.json"
 
@@ -66,43 +67,47 @@ def list_tasks(include_done: bool = True):
     return "\n".join(lines) if lines else "No matching tasks found."
 
 
-def complete_task(identifier: str):
-    """
-    identifier: either numeric ID as string, or part of description.
-    """
-    ident = identifier.strip()
-    if not ident:
-        return "Provide a task ID or part of the task description to complete."
+def load_tasks():
+    with open(TASKS_FILE, "r") as f:
+        return json.load(f)
 
-    data = _load_raw()
-    tasks = data.get("tasks", [])
+def save_tasks(data):
+    with open(TASKS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
 
-    if not tasks:
-        return "You have no tasks to complete."
 
-    # Try numeric ID first
-    task = None
-    if ident.isdigit():
-        tid = int(ident)
-        for t in tasks:
-            if t.get("id") == tid:
-                task = t
-                break
+def complete_task(user_input):
+    data = load_tasks()
+    tasks = data["tasks"]
 
-    # Fallback: fuzzy match by description substring
-    if task is None:
-        lowered = ident.lower()
-        matches = [t for t in tasks if lowered in t.get("description", "").lower()]
-        if len(matches) == 1:
-            task = matches[0]
-        elif len(matches) > 1:
-            ids = ", ".join(f"#{m['id']}" for m in matches)
-            return f"Multiple tasks matched that phrase. Be more specific. Possible IDs: {ids}"
-        else:
-            return "I couldn't find any task matching that."
+    # 1. Try matching exact ID
+    try:
+        numeric_id = int(user_input.strip())
+        matches = [t for t in tasks if t["id"] == numeric_id]
+        if matches:
+            matches[0]["status"] = "done"
+            save_tasks(data)
+            return f"Task '{matches[0]['description']}' marked as completed."
+    except:
+        pass
 
-    task["status"] = "done"
-    task["completed_at"] = datetime.utcnow().isoformat() + "Z"
-    _save_raw(data)
+    # 2. Match by name (similarity)
+    matches = sorted(
+        tasks,
+        key=lambda t: SequenceMatcher(None, t["description"].lower(), user_input.lower()).ratio(),
+        reverse=True
+    )
 
-    return f"Marked task #{task['id']} as completed: {task['description']}"
+    top_match = matches[0]
+
+    # Check if there are duplicates with same name
+    duplicates = [t for t in tasks if t["description"].lower() == top_match["description"].lower() and t["status"] != "done"]
+
+    if len(duplicates) > 1:
+        options = "\n".join([f"{t['id']}: {t['description']} ({t['status']})" for t in duplicates])
+        return f"There are multiple matching tasks. Which one do you want to complete?\n\n{options}"
+
+    # Only one → complete it
+    top_match["status"] = "done"
+    save_tasks(data)
+    return f"Task '{top_match['description']}' marked completed."

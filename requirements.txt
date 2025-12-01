@@ -1,3 +1,4 @@
 chromadb
 ollama
-duckduckgo-search
+python-dotenv
+tavily

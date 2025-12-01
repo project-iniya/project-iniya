@@ -1,8 +1,10 @@
-import json,re
+import json,re,os
 from tavily import TavilyClient
-from config import TAVILY_API_KEY
 from .memory_tasks import add_task, list_tasks, complete_task
 from .scraper import scrape_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # LLM may respond with natural text before JSON, so parser should catch the first valid JSON.
 
@@ -11,7 +13,7 @@ def log(msg):
     if DEBUG:
         print(f"[TOOLS] {msg}")
 
-tavily = TavilyClient(api_key=TAVILY_API_KEY)
+tavily = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 def web_search(query: str, max_results: int = 5) -> str:
     """
     Performs a focused web search using Tavily.

@@ -67,10 +67,21 @@ class BrainAgent:
 == MEMORY SEARCH ==
 {mem_text}
 
-Rules:
-- If a tool is needed, respond ONLY with JSON: {{"action":"tool","input":"value"}}
-- NO extra words, no explanation alongside JSON.
-- After a tool result is returned, NEVER call another tool unless the user explicitly says so.
+TOOL EXECUTION RULES:
+-----------------------------------
+- You NEVER execute tasks yourself.
+- If the user asks for something that can be handled by a tool, you MUST return ONLY a JSON tool call.
+
+FORMAT MUST BE:
+{"action": "<tool_name>", "input": "<arguments>"}
+
+- DO NOT reply with text, explanations, confirmations, or polite responses.
+- DO NOT assume the tool ran automatically.
+- DO NOT mark tasks as complete yourself — ONLY the tool does that.
+- After a tool result is returned to you, THEN you may respond naturally.
+
+If unsure whether a tool applies, ALWAYS default to calling one.
+-----------------------------------
 """
 
     # ---------------- Main Thinking Loop ----------------
@@ -113,16 +124,20 @@ Rules:
 
             result = TOOLS[action](tool_input)
 
-            followup = f"""
-Tool Result:
-{result}
+            # Correct follow-up format to prevent new tool invocation
+            tool_message = {
+                "role": "tool",
+                "name": action,
+                "content": str(result)
+            }
 
-Now respond clearly. DO NOT request another tool unless user ASKED again.
-"""
+            # Now ask the model to continue the conversation
+            final = ask_model(system_prompt, tool_message)
 
-            final = ask_model(system_prompt, followup)
-            store_message(f"RESULT: {final}")
-            return final
+            store_message(f"RESULT: {result}")
+            store_message(f"{ASSISTANT_NAME}:{final}")
+
+            return f"{ASSISTANT_NAME}: {final}"
 
         # ==== Normal Chat ====
         store_message(f"USER:{user_input}")
