@@ -56,33 +56,33 @@ class BrainAgent:
         pref_text = "\n".join([f"{k}: {v}" for k, v in prefs.items()]) if prefs else "None"
 
         return f"""
-{PERSONALITY}
+          {PERSONALITY}
 
-== USER FACTS ==
-{facts if facts else "None recorded"}
+          == USER FACTS ==
+          {facts if facts else "None recorded"}
 
-== USER PREFERENCES ==
-{pref_text}
+          == USER PREFERENCES ==
+          {pref_text}
 
-== MEMORY SEARCH ==
-{mem_text}
+          == MEMORY SEARCH ==
+          {mem_text}
 
-TOOL EXECUTION RULES:
------------------------------------
-- You NEVER execute tasks yourself.
-- If the user asks for something that can be handled by a tool, you MUST return ONLY a JSON tool call.
+          TOOL EXECUTION RULES:
+          -----------------------------------
+          - You NEVER execute tasks yourself.
+          - If the user asks for something that can be handled by a tool, you MUST return ONLY a JSON tool call.
 
-FORMAT MUST BE:
-{"action": "<tool_name>", "input": "<arguments>"}
+          FORMAT MUST BE:
+          {{"action": "<tool_name>", "input": "<arguments>"}}
 
-- DO NOT reply with text, explanations, confirmations, or polite responses.
-- DO NOT assume the tool ran automatically.
-- DO NOT mark tasks as complete yourself — ONLY the tool does that.
-- After a tool result is returned to you, THEN you may respond naturally.
+          - DO NOT reply with text, explanations, confirmations, or polite responses.
+          - DO NOT assume the tool ran automatically.
+          - DO NOT mark tasks as complete yourself — ONLY the tool does that.
+          - After a tool result is returned to you, THEN you may respond naturally.
 
-If unsure whether a tool applies, ALWAYS default to calling one.
------------------------------------
-"""
+          If unsure whether a tool applies, ALWAYS default to calling one.
+          -----------------------------------
+          """
 
     # ---------------- Main Thinking Loop ----------------
     def process(self, user_input: str):
