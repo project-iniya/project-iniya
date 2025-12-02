@@ -1,4 +1,4 @@
-#  Iniya AI — The Autonomous AI Assistant (Early Prototype)
+# Project Iniya — The Autonomous AI Assistant (Early Prototype)
 
 ###  Status: In Early Development
 
