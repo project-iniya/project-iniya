@@ -1,0 +1,19 @@
+chromadb
+ollama
+python-dotenv
+tavily
+elevenlabs
+silero
+onnxruntime 
+soundfile 
+numpy
+torch
+torchvision 
+torchaudio 
+audioop-lts
+yt-dlp 
+sounddevice
+flask
+flask_cors
+-e ./Visualizer/point-e
+faster-whisper
