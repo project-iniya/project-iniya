@@ -21,10 +21,11 @@ The goal is not just to make another chatbot — but to create a **long-term sca
 - ffmpeg, mpv for Audio
 - Nvidia GPU with Cuda for offline ollama models
 - Ollama Cloud model also available (requires messing with llm_wrapper.py for now to enable)
+- This is a Windows Only Project. No plans for adding Linux Support
 
 ### CUDA
 - This Project Contains Cuda Runtime DLLS which are a Property of Nvidia Coorporation
-- This Project Ships with Cuda Dlls of verision v12.9 and v13.0
+- This Project Ships with Cuda runtime Dlls of verision v12.9 and v13.0
 
 ---
 
@@ -46,9 +47,9 @@ This is **not just software — it's a platform in progress.**
 ✔ AI reasoning engine (foundation)  
 ✔ Prompt framework and architecture  
 ✔ Experimental memory layer  
-✔ Voice TTS Added(only the TTS Scripts and Models, No integration)
-✔ Voice STT Added(only the STT Scripts and Models, No integration)
-✔ Added Visualization(only Scripts)
+✔ Voice TTS Added(only the TTS Scripts and Models, No integration) 
+✔ Voice STT Added(only the STT Scripts and Models, No integration) 
+✔ Added Visualization(only Scripts) 
 
 ❌ Voice interface  
 ❌ Physical holographic output  
@@ -84,7 +85,7 @@ Those systems will be added in future iterations.
 ## License! 
 
 This repository is protected under the **Custom Restricted License (CRL-1.0)**.  
-Use, modification, execution, or redistribution of the code is **prohibited** without  
+Modification or redistribution of the code is **prohibited** without  
 explicit written permission from the author.
 
 See the `LICENSE` file for full terms.

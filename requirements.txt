@@ -17,3 +17,4 @@ flask
 flask_cors
 -e ./Visualizer/point-e
 faster-whisper
+huggingface_hub
