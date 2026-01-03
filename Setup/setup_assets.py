@@ -27,7 +27,7 @@ def download_assets():
         allow_patterns=[
             "cuda/**",
             "Audio/**",
-            "point_e_models/**",
+            "point_e_model_cache/**",
             "Visualizers/**",
         ],
     )
