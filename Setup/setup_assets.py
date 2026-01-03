@@ -2,10 +2,11 @@ from huggingface_hub import snapshot_download
 from pathlib import Path
 import subprocess
 import shutil
-import sys
+import sys, os
 
 REPO_ID = "night-games-20/project-Iniya-Assets" 
-PROJECT_ROOT = Path(__file__).parent.resolve()
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, PROJECT_ROOT)
 
 def exists(cmd):
     return shutil.which(cmd) is not None
@@ -51,5 +52,7 @@ def download_ollama_models():
     print("✅ Ollama models ready")
 
 if __name__ == "__main__":
+    print("=== Setting up Project Iniya assets ===")
+    print("Note: This may take a good bit of time depending on your internet connection.")
     download_ollama_models()
     download_assets()
