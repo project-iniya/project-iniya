@@ -28,6 +28,7 @@ def download_assets():
             "cuda/**",
             "Audio/**",
             "point_e_models/**",
+            "Visualizers/**",
         ],
     )
 
