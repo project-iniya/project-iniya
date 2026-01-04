@@ -22,6 +22,7 @@ ALLOW_PREFIXES = (
     "Audio/",
     "point_e_model_cache/",
     "Visualizer/",
+    "poppler/",
 )
 
 MAX_RETRIES = 5

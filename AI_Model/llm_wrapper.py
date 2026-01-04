@@ -1,6 +1,6 @@
 import ollama # type: ignore
 import subprocess
-from .log import log
+from log import log
 
 
 

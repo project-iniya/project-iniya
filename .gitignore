@@ -6,6 +6,7 @@ temp/
 .env
 skip
 *.log
+sample.pdf
 
 
 sdf_encoding_checkpoints/
@@ -17,3 +18,4 @@ Song_Player/
 
 point_e_model_cache/
 cuda/
+poppler/

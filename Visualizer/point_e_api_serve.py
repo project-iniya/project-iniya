@@ -34,7 +34,7 @@ sys.path.insert(0, project_root)
 
 from AI_Model.log import log
 from AI_Model.llm_wrapper import DEFAULT_MODEL , preload_model
-from AI_Model.sub_llm.sub_llm_wrapper import DEFAULT_MODEL as SUB_DEFAULT_MODEL
+from AI_Model.tools.sub_llm.sub_llm_wrapper import DEFAULT_MODEL as SUB_DEFAULT_MODEL
 
 # Ollama management
 try:

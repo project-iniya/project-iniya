@@ -18,3 +18,9 @@ flask_cors
 -e ./Visualizer/point-e
 faster-whisper
 huggingface_hub
+PyPDF2
+pytesseract
+python-docx
+pandas
+openpyxl
+pdf2image
