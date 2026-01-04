@@ -14,7 +14,20 @@ Right now, this repository contains only the **core AI "brain" layer**, which wi
 The goal is not just to make another chatbot — but to create a **long-term scalable assistant architecture** that can grow far beyond text-only interaction.
 
 ---
+## Installation and Usage
 
+- Make sure to have Python and Nvidia Drivers(if using nvidia GPU) installed
+- Make sure you have winget, otherwise you have to install mpv, ffmpeg, ollama manually
+- Install this Project to your Device Using the Following commands:
+
+```
+git clone https://github.com/project-iniya/project-iniya
+cd project-iniya
+python setup.py
+```
+- To Try/Test the Project run this command: `python main.example.py`
+
+---
 ##  Software Requirments
 
 - Python 3.13 (Anaconda Python used for Development)

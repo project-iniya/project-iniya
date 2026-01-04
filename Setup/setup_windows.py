@@ -31,6 +31,14 @@ def install_mpv():
         ensure_winget()
         run(["winget", "install", "-e", "--id", "mpv.net"])
 
+def install_ollama():
+    if exists("ollama"):
+        print("✅ ollama already installed")
+    else:
+        print("⬇ Installing ollama...")
+        ensure_winget()
+        run(["winget", "install", "-e", "--id", "Ollama.Ollama"])
+
 def has_nvidia_gpu():
     try:
         subprocess.run(
@@ -48,6 +56,7 @@ def main():
     print("=== Project Iniya setup (Windows) ===")
     install_ffmpeg()
     install_mpv()
+    install_ollama()
     
     if has_nvidia_gpu():
         print("✅ NVIDIA GPU detected")
