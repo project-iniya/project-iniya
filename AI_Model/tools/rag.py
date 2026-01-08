@@ -111,14 +111,14 @@ class RAGSystem:
             self.log(f"✗ Error during OCR: {e}", "RAG")
             return ""
     
-    def _chunk_text(self, text, chunk_size=500, overlap=50):
-        """Split text into overlapping chunks"""
+    def _chunk_text(self, text, chunk_size=300, overlap=50):
+        """Split text into overlapping chunks with token awareness"""
         words = text.split()
         chunks = []
         
         for i in range(0, len(words), chunk_size - overlap):
             chunk = ' '.join(words[i:i + chunk_size])
-            if chunk:
+            if chunk and len(chunk) > 20:  # Skip tiny chunks
                 chunks.append(chunk)
         
         return chunks
@@ -154,7 +154,7 @@ class RAGSystem:
         else:
             self.log(f"✗ Unsupported file type: {ext}", "RAG")
     
-    def load_pdf(self, pdf_path, chunk_size=500, force_reload=False, use_ocr=False):
+    def load_pdf(self, pdf_path, chunk_size=200, force_reload=False, use_ocr=False):
         """Load and index a PDF file with optional OCR"""
         doc_id = os.path.basename(pdf_path)
         
@@ -179,17 +179,41 @@ class RAGSystem:
             
             # Generate embeddings and store
             for i, chunk in enumerate(chunks):
-                res = ollama.embeddings(model=EMBED_MODEL, prompt=chunk)
-                
-                self.collection.add(
-                    documents=[chunk],
-                    embeddings=[res['embedding']],
-                    metadatas=[{"source": doc_id, "chunk_index": i, "type": "pdf"}],
-                    ids=[f"{doc_id}_chunk_{i}"]
-                )
-                
-                if (i + 1) % 10 == 0:
-                    self.log(f"Processed {i + 1}/{len(chunks)} chunks", "RAG")
+                try:
+                    # Try to embed the chunk
+                    res = ollama.embeddings(model=EMBED_MODEL, prompt=chunk)
+                    
+                    self.collection.add(
+                        documents=[chunk],
+                        embeddings=[res['embedding']],
+                        metadatas=[{"source": doc_id, "chunk_index": i, "type": "pdf"}],
+                        ids=[f"{doc_id}_chunk_{i}"]
+                    )
+                    
+                    if (i + 1) % 10 == 0:
+                        self.log(f"Processed {i + 1}/{len(chunks)} chunks", "RAG")
+                        
+                except Exception as e:
+                    if "exceeds the context length" in str(e):
+                        self.log(f"⚠ Chunk {i} too large, splitting further...", "RAG")
+                        # Split the chunk in half and try again
+                        words = chunk.split()
+                        mid = len(words) // 2
+                        sub_chunks = [' '.join(words[:mid]), ' '.join(words[mid:])]
+                        
+                        for j, sub_chunk in enumerate(sub_chunks):
+                            try:
+                                res = ollama.embeddings(model=EMBED_MODEL, prompt=sub_chunk)
+                                self.collection.add(
+                                    documents=[sub_chunk],
+                                    embeddings=[res['embedding']],
+                                    metadatas=[{"source": doc_id, "chunk_index": f"{i}_{j}", "type": "pdf"}],
+                                    ids=[f"{doc_id}_chunk_{i}_{j}"]
+                                )
+                            except Exception as sub_e:
+                                self.log(f"✗ Failed to embed sub-chunk: {sub_e}", "RAG")
+                    else:
+                        self.log(f"✗ Error embedding chunk {i}: {e}", "RAG")
             
             self.log(f"✓ PDF loaded successfully!", "RAG")
         except Exception as e:

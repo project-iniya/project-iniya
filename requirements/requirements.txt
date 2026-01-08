@@ -7,9 +7,6 @@ silero
 onnxruntime 
 soundfile 
 numpy
-torch
-torchvision 
-torchaudio 
 audioop-lts
 yt-dlp 
 sounddevice
@@ -24,3 +21,6 @@ python-docx
 pandas
 openpyxl
 pdf2image
+pyside6
+pyinstaller
+beautifulsoup4

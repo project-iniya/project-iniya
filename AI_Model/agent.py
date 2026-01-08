@@ -1,9 +1,9 @@
-from memory_static import load_static_memory, add_fact, set_preference, delete_fact
-from memory_vector import store_message, search_relevant, delete_vector_memory
-from personality import PERSONALITY, ASSISTANT_NAME
-from llm_wrapper import ask_model, preload_model, unload_model
-from tools.tools import TOOLS, parse_tool_call
-from log import log
+from .memory_static import load_static_memory, add_fact, set_preference, delete_fact
+from .memory_vector import store_message, search_relevant, delete_vector_memory
+from .personality import PERSONALITY, ASSISTANT_NAME
+from .llm_wrapper import ask_model, preload_model, unload_model
+from .tools.tools import TOOLS, parse_tool_call
+from .log import log
 import re
 
 #===== Functions =====

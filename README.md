@@ -30,10 +30,11 @@ python setup.py
 ---
 ##  Software Requirments
 
-- Python 3.13 (Anaconda Python used for Development)
+- Python 3.13
 - ffmpeg, mpv for Audio
 - Nvidia GPU with Cuda for offline ollama models
-- Ollama Cloud model also available (requires messing with llm_wrapper.py for now to enable)
+- Ollama Cloud model also Usable
+- Edit `AI_Model/llm_wrapper.py` To Change or Try/Test Models. Defualt Model is `qwen2.5:7b-instruct-q4_0`
 - This is a Windows Only Project. No plans for adding Linux Support
 
 ### CUDA
@@ -51,8 +52,6 @@ python setup.py
 - 🔮 Future projection: hologram-style visual interface  
 - 🤖 Integration with robotics, AR, smart environments  
 
-This is **not just software — it's a platform in progress.**
-
 ---
 
 ##  Current Stage
@@ -60,9 +59,9 @@ This is **not just software — it's a platform in progress.**
 ✔ AI reasoning engine (foundation)  
 ✔ Prompt framework and architecture  
 ✔ Experimental memory layer  
-✔ Voice TTS Added(only the TTS Scripts and Models, No integration) 
-✔ Voice STT Added(only the STT Scripts and Models, No integration) 
-✔ Added Visualization(only Scripts) 
+✔ Voice TTS Added(only the TTS Scripts and Models, No integration)  
+✔ Voice STT Added(only the STT Scripts and Models, No integration)  
+✔ Added Visualization(only Scripts)  
 
 ❌ Voice interface  
 ❌ Physical holographic output  

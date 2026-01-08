@@ -1,10 +1,11 @@
-import ollama # type: ignore
+import ollama
 import subprocess
-from log import log
+from .log import log
 
 
 
 # Default Local model for your assistant (can be auto-switched later)
+# Not Finalized - you can choose your own preferred model here
 DEFAULT_MODEL = "qwen2.5:7b-instruct-q4_0"
 
 #Cloud Models

@@ -6,7 +6,7 @@ sys.path.insert(0, project_root)
 from tavily import TavilyClient 
 from AI_Model.memory_tasks import add_task, list_tasks, complete_task
 from AI_Model.log import log
-from scraper import scrape_url
+from .scraper import scrape_url
 from dotenv import load_dotenv 
 
 load_dotenv()

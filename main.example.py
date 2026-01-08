@@ -1,10 +1,47 @@
 from multiprocessing import Process, freeze_support, Queue
 from threading import Thread, Event
 import time
+from pathlib import Path
+import os, sys
+import subprocess
 
 from AI_Model.agent import BrainAgent
 from AI_Model.log import log, init_log_queue, log_drain_loop
 from Visualizer.point_e_api_serve import main as point_e_main_server
+
+
+VENV_DIR = Path(".venv")
+VENV_PYTHON = VENV_DIR / "Scripts" / "python.exe"
+
+def ensure_running_in_venv():
+    """
+    Ensure this script is running inside .venv.
+    If not:
+      - re-run with .venv Python
+      - or exit if .venv does not exist
+    """
+
+    # Already inside venv → good
+    if sys.prefix.endswith(str(VENV_DIR)):
+        return
+
+    # Not inside venv
+    if not VENV_PYTHON.exists():
+        print("❌ Virtual environment '.venv' not found.")
+        print("Running setup.py to create it...")
+        subprocess.run(
+            [sys.executable, "setup.py"],
+            check=True
+        )
+
+
+    print("🔁 Restarting inside virtual environment...")
+    subprocess.run(
+        [str(VENV_PYTHON), *sys.argv],
+        check=True
+    )
+    sys.exit(0)
+
 
 def chat_loop():
     agent = BrainAgent()
@@ -26,7 +63,9 @@ def chat_loop():
 
 
 if __name__ == "__main__":
+    ensure_running_in_venv()  
     freeze_support()  # REQUIRED on Windows
+
     log_queue = Queue()
     init_log_queue(log_queue)  # Simple logging to console
 

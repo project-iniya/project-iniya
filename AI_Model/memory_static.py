@@ -1,6 +1,6 @@
 import json
 import os
-from log import log
+from .log import log
 
 MEMORY_FILE = "AI_Model/memory/static_memory.json"
 
