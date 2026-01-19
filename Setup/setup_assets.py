@@ -89,6 +89,22 @@ def download_ollama_models():
 
     print("✅ Ollama models ready")
 
+# ---------------- Transfromers/Detoxify -------------- #
+def download_transformer_models():
+    import transformers, detoxify
+
+    print("⬇ Downloading transformer Models")
+
+    transformer_models=["facebook/roberta-hate-speech-dynabench-r4-target"]    
+    for tm in transformer_models:
+        transformers.AutoTokenizer.from_pretrained(tm)
+        transformers.AutoModelForSequenceClassification.from_pretrained(tm)
+
+    print("⬇ Downloading Detoxify Models")
+    detoxify.Detoxify("original")
+    
+    print("✅ Transformer and Detoxify Model Downloaded")
+
 # ---------------- ENTRYPOINT ---------------- #
 
 if __name__ == "__main__":
@@ -96,3 +112,4 @@ if __name__ == "__main__":
     print("Note: This may take a good bit of time depending on your internet connection.")
     download_ollama_models()
     download_assets()
+    download_transformer_models()

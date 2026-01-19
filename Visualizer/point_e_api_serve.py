@@ -67,7 +67,7 @@ class OllamaManager:
             return []
 
         try:
-            result = ollama.list()
+            result = ollama.ps()
             models = []
 
             for m in result.get("models", []):
@@ -80,7 +80,7 @@ class OllamaManager:
                 elif "name" in m:
                     models.append(m["name"])
 
-            return models in [DEFAULT_MODEL, SUB_DEFAULT_MODEL]
+            return models
 
         except Exception as e:
             log(f"Could not check Ollama models: {e}", "OLLAMA")

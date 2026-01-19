@@ -6,7 +6,9 @@ from .log import log
 
 # Default Local model for your assistant (can be auto-switched later)
 # Not Finalized - you can choose your own preferred model here
-DEFAULT_MODEL = "qwen2.5:7b-instruct-q4_0"
+# DEFAULT_MODEL = "qwen2.5:7b-instruct-q4_0"
+# DEFAULT_MODEL = "qwen3-vl:4b-instruct-q4_K_M"
+DEFAULT_MODEL = "qwen3-vl:4b-thinking-q4_K_M"
 
 #Cloud Models
 #DEFAULT_MODEL = "qwen3-vl:235b-cloud"
@@ -82,19 +84,27 @@ def ask_model(system_prompt, messages, model: str = DEFAULT_MODEL) -> str:
     return chat(final_messages, model=model)
 
 def preload_model(model: str = DEFAULT_MODEL, keep_alive: int = 3600):
+    """
+    Preload a model and keep it in memory.
+    
+    Args:
+        model: Model name to load
+        keep_alive: How long to keep in memory (seconds)
+                    Use -1 to keep indefinitely
+                    Use 0 to unload immediately after
+    """
     if not ensure_model_available(model):
         return False
 
     try:
-        log(f"Preloading model '{model}' (full warmup)...", "LLM")
+        log(f"Preloading model '{model}' (keep_alive={keep_alive}s)...", "LLM")
 
+        # ✅ FIX: Use generate() for faster loading with less overhead
         ollama.chat(
             model=model,
             messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": "Reply with OK."}
+                {"role": "system", "content": "This is to Start You UP For the Usage of the User So. get Ready.. (dont reply to this msg , reply with a max OK)"},
             ],
-            options={"num_ctx": 4096},
             keep_alive=keep_alive
         )
 
@@ -109,15 +119,17 @@ def preload_model(model: str = DEFAULT_MODEL, keep_alive: int = 3600):
 def unload_model(model: str = DEFAULT_MODEL):
     """
     Forces Ollama to unload the model from RAM/VRAM immediately.
+    Uses generate() with empty prompt for instant unload (<1 second).
     """
-
     try:
         log(f"Unloading model '{model}' from memory...", "LLM")
 
-        ollama.chat(
+        # ✅ FIX: Use generate() instead of chat() - much faster!
+        # Empty prompt means no processing, just immediate unload
+        ollama.generate(
             model=model,
-            messages=[{"role": "system", "content": "unload"}],
-            keep_alive=0
+            prompt="",  # Empty prompt - no processing needed
+            keep_alive=0  # Unload immediately
         )
 
         log(f"Model '{model}' unloaded successfully.", "LLM")
@@ -126,3 +138,66 @@ def unload_model(model: str = DEFAULT_MODEL):
     except Exception as e:
         log(f"❌ Failed to unload model '{model}': {e}", "LLM")
         return False
+
+
+def unload_all_models():
+    """
+    Unload ALL currently loaded Ollama models.
+    Useful when you need to free maximum VRAM.
+    """
+    try:
+        log("Checking for loaded Ollama models...", "LLM")
+        
+        # ✅ Use ollama.ps() to get RUNNING models (not just downloaded ones)
+        ps_result = ollama.ps()
+        running_models = ps_result.get('models', [])
+        
+        if not running_models:
+            log("No Ollama models currently loaded", "LLM")
+            return True
+        
+        log(f"Found {len(running_models)} loaded model(s)", "LLM")
+        
+        # Unload each model
+        for model_info in running_models:
+            model_name = model_info.get('name', model_info.get('model', 'unknown'))
+            log(f"Unloading: {model_name}...", "LLM")
+            
+            try:
+                ollama.generate(
+                    model=model_name,
+                    prompt="",
+                    keep_alive=0
+                )
+                log(f"✓ Unloaded: {model_name}", "LLM")
+            except Exception as e:
+                log(f"✗ Failed to unload {model_name}: {e}", "LLM")
+        
+        log("All Ollama models unloaded", "LLM")
+        return True
+        
+    except Exception as e:
+        log(f"❌ Error checking/unloading models: {e}", "LLM")
+        return False
+
+
+def get_loaded_models():
+    """
+    Get list of currently loaded Ollama models.
+    Returns: List of model names
+    """
+    try:
+        ps_result = ollama.ps()
+        running_models = ps_result.get('models', [])
+        
+        model_names = []
+        for m in running_models:
+            name = m.get('name', m.get('model', ''))
+            if name:
+                model_names.append(name)
+        
+        return model_names
+        
+    except Exception as e:
+        log(f"Could not get loaded models: {e}", "LLM")
+        return []

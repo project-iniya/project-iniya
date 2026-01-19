@@ -24,3 +24,6 @@ pdf2image
 pyside6
 pyinstaller
 beautifulsoup4
+detoxify 
+transformers 
+rapidfuzz

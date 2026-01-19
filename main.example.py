@@ -58,8 +58,11 @@ def chat_loop():
         reply = agent.process(user)
         elapsed = time.perf_counter() - start
 
+        try: log(f"Cleaned Text: {reply['clean_text']}", "Test"); 
+        except: pass
+
         log(f"Iniya: {reply['text']}")
-        log(f"⏱ {elapsed:.2f}s\n")
+        log(f"⏱ Time Taken:  {elapsed:.2f}s\n")
 
 
 if __name__ == "__main__":

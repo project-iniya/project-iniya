@@ -37,9 +37,13 @@ python setup.py
 - Edit `AI_Model/llm_wrapper.py` To Change or Try/Test Models. Defualt Model is `qwen2.5:7b-instruct-q4_0`
 - This is a Windows Only Project. No plans for adding Linux Support
 
-### CUDA
+#### CUDA
 - This Project Contains Cuda Runtime DLLS which are a Property of Nvidia Coorporation
 - This Project Ships with Cuda runtime Dlls of verision v12.9 and v13.0
+
+#### HF Assets
+- The Assets such as Models, DLLS, Binaries are Hosted separately on Hugging Face as a Dataset
+- Assets Dataset Link - [Project-Iniya-Assets](https://huggingface.co/datasets/night-games-20/project-Iniya-Assets/tree/main)
 
 ---
 
@@ -80,19 +84,23 @@ Those systems will be added in future iterations.
 
 ---
 
-## Audio Stack (Current, TTS Only)
+## Audio Stack (Current)
 
 - Main Audio TTS interface is Elevenlabs API with its Flash v2.5 Model
 - secondary offline TTS is Silero TTS with its en_v5 TTS Model
 - Audio Play using mpv through subprocess module
+- STT using faster-whisper library 
+- STT Models used whisper-tiny
 
 ---
+
 ## Visualiztion
 
 - This Project Uses Point-E which is a Ai Model Provided by OpenAI
 - Uses a Custom Build cloudPoint to SDF encoder
 - Uses Three.js to use SDF encodings to display Objects 
 
+---
 
 ## License! 
 

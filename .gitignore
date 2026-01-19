@@ -2,12 +2,15 @@ AI_Model/memory/
 __pycache__/
 cache/
 temp/
+.cache/
 
 .venv/
 .env
 skip
 *.log
 sample.pdf
+test.py
+test.txt
 
 
 sdf_encoding_checkpoints/
