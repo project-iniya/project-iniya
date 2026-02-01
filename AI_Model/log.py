@@ -3,7 +3,8 @@ from multiprocessing import Queue
 from typing import Optional
 from datetime import datetime
 
-DEBUG = True
+# Debug mode flag
+from .config import DEBUG_MODE as DEBUG
 
 # Global log queue (optional)
 LOG_QUEUE: Optional[Queue] = None

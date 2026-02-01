@@ -8,7 +8,7 @@ temp/
 .env
 skip
 *.log
-sample.pdf
+sample.*
 test.py
 test.txt
 

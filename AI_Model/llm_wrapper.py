@@ -2,16 +2,7 @@ import ollama
 import subprocess
 from .log import log
 
-
-
-# Default Local model for your assistant (can be auto-switched later)
-# Not Finalized - you can choose your own preferred model here
-# DEFAULT_MODEL = "qwen2.5:7b-instruct-q4_0"
-# DEFAULT_MODEL = "qwen3-vl:4b-instruct-q4_K_M"
-DEFAULT_MODEL = "qwen3-vl:4b-thinking-q4_K_M"
-
-#Cloud Models
-#DEFAULT_MODEL = "qwen3-vl:235b-cloud"
+from .config import DEFAULT_MODEL
 
 _MODEL_AVAILABLE_CACHE = set()
 
