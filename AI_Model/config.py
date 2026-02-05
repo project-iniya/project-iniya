@@ -14,3 +14,6 @@ DEFAULT_CLOUD_MODEL = "qwen3-vl:235b-cloud"
 
 # Debug mode (enables logging and extra checks)
 DEBUG_MODE = True
+
+# Chat ID 
+CURRENT_CHAT_ID="ae6e394c-8521-4d43-abdf-b0d34b891f78"

@@ -1,0 +1,13 @@
+.mainAPP{
+  font-family:
+    "Fira Code",
+    "Fira Mono",
+    Menlo,
+    Consolas,
+    "DejaVu Sans Mono",
+    monospace;
+  background-color: #242325;
+  color: #ffffff;
+  height: 100vh;
+  margin: 0;
+}

@@ -1,6 +1,7 @@
 import subprocess
 import sys
 from pathlib import Path
+import uuid
 
 VENV_DIR = Path(".venv")
 VENV_PYTHON = VENV_DIR / "Scripts" / "python.exe"
@@ -97,7 +98,13 @@ def main_setup():
     )
     print("✅ Assets downloaded")
 
-
+    #Creating First Chat
+    import AI_Model.config as aiconf
+    if aiconf.CURRENT_CHAT_ID: 
+        pass
+    else:
+        aiconf.CURRENT_CHAT_ID = str(uuid.uuid4())
+  
 
 if __name__ == "__main__":
     ensure_windows()

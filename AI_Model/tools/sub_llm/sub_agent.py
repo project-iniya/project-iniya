@@ -1,6 +1,4 @@
 import os, sys
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-sys.path.insert(0, project_root)
 
 from .sub_llm_wrapper import ask_sub_model
 from .sub_personality import SDF_ENCODING_INSTRUCTION, SHAPE_GENERATION_INSTRUCTION, URL_FROM_TEXT_INSTRUCTION, SONG_INFO_EXTRACTION_INSTRUCTION

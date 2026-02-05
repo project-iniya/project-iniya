@@ -13,9 +13,10 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
 from AI_Model.log import log
+from AI_Model.config import CURRENT_CHAT_ID
 
 EMBED_MODEL = "mxbai-embed-large"
-DB_PATH = "AI_Model/memory/rag_memory"
+DB_PATH = f"AI_Model/memory/{CURRENT_CHAT_ID}/rag_memory"
 POPPLER_PATH = os.path.join(project_root, "poppler", "Library", "bin")
 
 class RAGSystem:

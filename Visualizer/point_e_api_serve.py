@@ -29,9 +29,6 @@ CUDA_BIN  = os.path.join(CUDA_ROOT, "bin")
 os.environ["CUDA_PATH"] = CUDA_ROOT
 os.environ["PATH"] = CUDA_BIN + ";" + os.environ.get("PATH", "")
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, project_root)
-
 from AI_Model.log import log
 from AI_Model.llm_wrapper import DEFAULT_MODEL , preload_model
 from AI_Model.tools.sub_llm.sub_llm_wrapper import DEFAULT_MODEL as SUB_DEFAULT_MODEL

@@ -1,8 +1,4 @@
 import json,re,os,sys
-
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-sys.path.insert(0, project_root)
-
 from tavily import TavilyClient 
 from AI_Model.memory_tasks import add_task, list_tasks, complete_task
 from AI_Model.log import log

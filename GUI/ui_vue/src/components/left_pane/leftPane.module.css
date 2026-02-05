@@ -1,0 +1,185 @@
+.leftPane {
+  height: 100vh;
+  border-right: #353436 2px solid;
+  background-color: #151415;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 250px;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  overflow-y: scroll;
+  overflow: hidden;
+  will-change: width;
+
+}
+
+/* ---------------- STATES ---------------- */
+
+.leftPaneExpanded {
+  width: 250px;
+}
+
+.leftPaneCollapsed {
+  width: 50px;
+  background-color: #242325;
+}
+
+/* ---------------- TITLE BAR ---------------- */
+
+.paneTitleBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 14px;
+}
+
+.logoWrapper {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.logoWrapper > * {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.logoDefault {
+  width: 16px;
+  height: 16px;
+  padding: 6px;
+  border-radius: 50%;
+  border: #363434 1px solid;
+  transition: opacity 0.15s ease;
+}
+
+.logoCollapsed{
+  opacity: 0;
+}
+
+.logoPaneOpen {
+  opacity: 1;
+}
+
+/* ---------------- ICON BUTTONS ---------------- */
+
+.icon {
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.iconCollapsed {
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 10px 6px;
+  cursor: pointer;
+}
+
+/* ---------------- OPTIONS ---------------- */
+
+.optionBlocks {
+  display: flex;
+  flex-direction: column;
+  margin-top: 18px;
+}
+
+.optionBlock {
+  display: flex;
+}
+
+.Btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 0px;
+  cursor: pointer;
+}
+
+.Btn:hover {
+  background-color: #1f1f1f;
+}
+
+/* ---------------- TEXT ANIMATION ---------------- */
+
+.optionText {
+  margin-left: 10px;
+  white-space: nowrap;
+
+  transform-origin: left center;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* COLLAPSED TEXT */
+.leftPaneCollapsed .optionText {
+  opacity: 0;
+  transform: scaleX(0);
+  pointer-events: none;
+}
+
+/* ---------------- SCROLLBAR ---------------- */
+
+.leftPaneExpanded::-webkit-scrollbar {
+  width: 8px;
+}
+
+.leftPaneExpanded::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.leftPaneExpanded::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+
+/* ---------------- CHAT HISTORY BLOCK ---------------- */
+
+.chatHistoryBlock {
+  margin-top: 20px;
+  padding-bottom: 10px;
+}
+
+
+.chatHistoryTitle {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  margin-bottom: 8px;
+  color: #888888;
+  font-size: 15px;
+  font-weight: 500;
+  gap: 4px;
+}
+
+.Chevron{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #888888;
+}
+
+.Chevron svg {
+  transition: transform 0.25s ease;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}

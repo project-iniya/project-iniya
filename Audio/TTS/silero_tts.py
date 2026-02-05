@@ -5,10 +5,6 @@ from pathlib import Path
 import numpy as np
 import os, sys
 
-# Add project to path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, project_root)
-
 from AI_Model.log import log
 
 BASE_PATH = Path(__file__).parent / "models"

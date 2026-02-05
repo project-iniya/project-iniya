@@ -2,12 +2,7 @@ import ollama # type: ignore
 import subprocess
 import os, sys
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
-sys.path.insert(0, project_root)
-
 from AI_Model.log import log
-
-
 
 # Default Local model for Sub Model (can be auto-switched later)
 DEFAULT_MODEL = "qwen2.5:0.5b"

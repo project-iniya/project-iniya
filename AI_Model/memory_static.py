@@ -1,8 +1,9 @@
 import json
 import os
 from .log import log
+from .config import CURRENT_CHAT_ID
 
-MEMORY_FILE = "AI_Model/memory/static_memory.json"
+MEMORY_FILE = f"AI_Model/memory/{CURRENT_CHAT_ID}/static_memory.json"
 
 def load_static_memory():
     log("Loading static memory...", "STATIC MEMORY")

@@ -1,8 +1,9 @@
 import chromadb
 import ollama
 import uuid
+from .config import CURRENT_CHAT_ID
 
-DB_PATH = "AI_Model/memory/vector_memory"
+DB_PATH = f"AI_Model/memory/{CURRENT_CHAT_ID}/vector_memory"
 EMBED_MODEL = "mxbai-embed-large"
 
 _client = chromadb.PersistentClient(path=DB_PATH)

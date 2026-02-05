@@ -2,8 +2,9 @@ import json
 import os
 from datetime import datetime
 from difflib import SequenceMatcher
+from .config import CURRENT_CHAT_ID
 
-TASKS_FILE = "AI_Model/memory/tasks_memory.json"
+TASKS_FILE = f"AI_Model/memory/{CURRENT_CHAT_ID}/tasks_memory.json"
 
 
 def _load_raw():

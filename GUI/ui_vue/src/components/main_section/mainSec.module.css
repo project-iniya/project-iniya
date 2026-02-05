@@ -1,0 +1,13 @@
+.mainContainer{
+  border: none;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+}
+
+.mainPane{
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

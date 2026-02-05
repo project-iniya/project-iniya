@@ -5,13 +5,12 @@ import threading
 import time
 import torch
 import os, sys
+from pathlib import Path
 
-# Add project to path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-sys.path.insert(0, project_root)
+BASE_PATH = Path(__file__).parent.parent.parent
 
 CUDA_ROOT = r".\cuda\v12.9"
-CUDA_BIN  = os.path.join(CUDA_ROOT, "bin")
+CUDA_BIN  = os.path.join(BASE_PATH ,CUDA_ROOT, "bin")
 
 os.environ["CUDA_PATH"] = CUDA_ROOT
 os.environ["PATH"] = CUDA_BIN + ";" + os.environ.get("PATH", "")
@@ -37,39 +36,6 @@ audio_q = queue.Queue()
 def callback(indata, frames, time_info, status):
     audio_q.put(indata.copy())
 
-def list_usable_input_devices():
-    usable = []
-
-    for idx, dev in enumerate(sd.query_devices()):
-        name = dev["name"].lower()
-
-        # must be input
-        if dev["max_input_channels"] <= 0:
-            continue
-
-        # filter obvious junk
-        if any(bad in name for bad in BLACKLIST_KEYWORDS):
-            continue
-
-        # must support Whisper settings
-        try:
-            sd.check_input_settings(
-                device=idx,
-                samplerate=SAMPLE_RATE,
-                channels=1,
-                dtype="float32"
-            )
-        except Exception:
-            continue
-
-        usable.append({
-            "index": idx,
-            "name": dev["name"],
-            "channels": dev["max_input_channels"],
-            "samplerate": dev["default_samplerate"]
-        })
-
-    return usable
 
 def get_device_by_index(index: int):
     try:
@@ -98,6 +64,40 @@ class WhisperSTT:
         self.last_voice_time = time.time()
 
         self._load_model()
+
+    def list_usable_input_devices(self):
+        usable = []
+
+        for idx, dev in enumerate(sd.query_devices()):
+            name = dev["name"].lower()
+
+            # must be input
+            if dev["max_input_channels"] <= 0:
+                continue
+
+            # filter obvious junk
+            if any(bad in name for bad in BLACKLIST_KEYWORDS):
+                continue
+
+            # must support Whisper settings
+            try:
+                sd.check_input_settings(
+                    device=idx,
+                    samplerate=SAMPLE_RATE,
+                    channels=1,
+                    dtype="float32"
+                )
+            except Exception:
+                continue
+
+            usable.append({
+                "index": idx,
+                "name": dev["name"],
+                "channels": dev["max_input_channels"],
+                "samplerate": dev["default_samplerate"]
+            })
+
+        return usable
 
     # ---------------- MODEL ----------------
     def _load_model(self):
@@ -214,7 +214,7 @@ class WhisperSTT:
 if __name__ == "__main__":
     stt = WhisperSTT()
     print("Available Input Devices:")
-    for dev in list_usable_input_devices():
+    for dev in stt.list_usable_input_devices():
         print(f"{dev['index']}: {dev['name']} ({dev['channels']} channels)")
 
     device_index = int(input("Select input device index: "))
