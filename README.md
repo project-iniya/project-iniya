@@ -102,6 +102,15 @@ Those systems will be added in future iterations.
 
 ---
 
+## GUI
+
+- Work in Progress 
+- Pywebview based on edge WebView2
+- Web built on Vite + Vue With Javascript
+- GUI added but not integrated with The Main Script 
+
+---
+
 ## License! 
 
 This repository is protected under the **Custom Restricted License (CRL-1.0)**.  
