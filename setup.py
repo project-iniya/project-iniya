@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import uuid
 
+
 VENV_DIR = Path(".venv")
 VENV_PYTHON = VENV_DIR / "Scripts" / "python.exe"
 
@@ -97,6 +98,14 @@ def main_setup():
         check=True
     )
     print("✅ Assets downloaded")
+
+    # Bulding GUI dist File Using npm
+    subprocess.run(
+        ["npm", "run", "build"],
+        cwd="GUI/ui_vue",
+        check=True
+    )
+    print("✅ GUI Built using NPM")
 
     #Creating First Chat
     import AI_Model.config as aiconf

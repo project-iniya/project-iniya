@@ -4,10 +4,8 @@ from threading import Thread
 from pathlib import Path
 import json
 
-from AI_Model.config import CURRENT_CHAT_ID
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-UPLOAD_DIR = BASE_DIR / f"AI_Model/memory/{CURRENT_CHAT_ID}/uploads"
+BASE_DIR = Path(__file__).resolve().parent
+UPLOAD_DIR = BASE_DIR / "uploads"
 IMAGE_DIR = UPLOAD_DIR / "images"
 FILE_DIR = UPLOAD_DIR / "files"
 
@@ -18,9 +16,16 @@ FILE_DIR.mkdir(parents=True, exist_ok=True)
 class API:
     def __init__(self):
         self._window = None
+        self._child_conn = None
 
     def setWindow(self, window):
         self._window = window
+    
+    def setChildConn(self, conn):
+        self._child_conn = conn
+
+    def startLister(self):
+        Thread(target=self.receiveReply, daemon=True).start()
 
     def test_method(self, msg):
         """
@@ -74,26 +79,28 @@ class API:
     def sendQuestion(self, payload):
         try:
             print(f"Recieved Payload: {payload}")
-            Thread(target=self.evaluate, args=(payload,), daemon=True).start()
+            self._child_conn.send({"event":"message", "data":payload})
             return {"status": "ok", "message":"Payload Recieved"}
         except Exception as e:
             return {"status": "error", "message":str(e)}
     
-    def evaluate(self, payload):
-        data = {
-            "type": "message",
-            "source": "python",
-            "content": payload,
-            "timestamp": None  # JS will fill this
-        }
+    def receiveReply(self):
+        try:
+            while True:
+                msg = self._child_conn.recv()
+                if msg["event"] == "message":
+                    self._window.evaluate_js(
+                        f"window.sendResponse({json.dumps(msg["data"])})"
+                    )
+        except Exception as e:
+            data = {"status":"error","error":e}
+            self._window.evaluate_js(
+                f"window.Error({json.dumps(data)})"
+            )
 
-        self._window.evaluate_js(
-            f"window.sendResponse({json.dumps(data)})"
-        )
 
-
-def main():
-    UI_PATH = BASE_DIR / "GUI" /"ui_vue" / "dist" / "index.html"
+def main(child_conn):
+    UI_PATH = BASE_DIR / "ui_vue" / "dist" / "index.html"
 
     api = API()
     window = webview.create_window(
@@ -104,7 +111,10 @@ def main():
         js_api= api
     )
     api.setWindow(window)
+    api.setChildConn(child_conn)
+    api.startLister()
     webview.start(debug=True)
+    child_conn.send({"event":"system", "data":"shutdown"})
 
 
 if __name__ == "__main__":

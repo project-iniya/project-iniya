@@ -15,6 +15,14 @@ def ensure_winget():
         print("Please install App Installer from Microsoft Store.")
         sys.exit(1)
 
+def install_npm():
+    if exists("npm"):
+        print("✅ npm already installed")
+    else:
+        print("⬇ Installing npm...")
+        ensure_winget()
+        run(["winget", "install", "-e", "--id", "OpenJS.NodeJS"])
+
 def install_ffmpeg():
     if exists("ffmpeg"):
         print("✅ ffmpeg already installed")
@@ -54,6 +62,7 @@ def has_nvidia_gpu():
 
 def main():
     print("=== Project Iniya setup (Windows) ===")
+    install_npm()
     install_ffmpeg()
     install_mpv()
     install_ollama()

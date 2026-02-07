@@ -180,13 +180,12 @@
 }
 
 .userBubble {
-  background: #2563eb;
+  background: #565555;
   color: white;
   border-bottom-right-radius: 4px;
 }
 
 .botBubble {
-  background: #1f2933;
   color: #e5e7eb;
   border-bottom-left-radius: 4px;
 }
@@ -233,7 +232,7 @@
   background-clip: content-box;
 }
 .newChatTextWrapper {
-  height: 100%;
+  height: 90%;
   display: flex;
   align-items: center;     /* vertical center */
   justify-content: center; /* horizontal center */
@@ -241,11 +240,11 @@
 }
 
 .newChatText {
-  max-width: 600px;
+  max-width: 800px;
   line-height: 1;
   font-weight: 400;
   letter-spacing: 0.3px;
-  font-size: 1.5rem;
+  font-size: 2rem;
 }
 
 .newChatTextWrapper {
@@ -258,8 +257,43 @@
     transform: translateY(6px);
   }
   to {
-    font-size: 2rem;
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.chatHeader{
+  height: 30px;
+  padding: 10px;
+}
+
+.headerRow{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.headerSide{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerElement{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 5px;
+  transition: background-color 0.2s ease;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.headerElement:hover{
+  background-color: #565555;
 }

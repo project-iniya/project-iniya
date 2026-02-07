@@ -601,7 +601,7 @@ def generate():
 # RUN SERVER
 # ============================================================================
 
-def main():
+def main(ready_event=None):
     log("="*60, "SERVER")
     log("Starting Flask server on http://localhost:5000", "SERVER")
     log("="*60, "SERVER")
@@ -615,7 +615,11 @@ def main():
     log("  - Ollama automatically reloaded after generation", "SERVER")
     log("="*60, "SERVER")
     
+    if ready_event:
+        ready_event.set()
+
     app.run(host='0.0.0.0', port=5000, debug=False)
+
 
 if __name__ == '__main__':
     main()

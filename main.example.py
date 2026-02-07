@@ -1,5 +1,5 @@
-from multiprocessing import Process, freeze_support, Queue
-from threading import Thread, Event
+from multiprocessing import Process, freeze_support, Queue, Pipe, Event
+from threading import Thread
 import time
 from pathlib import Path
 import os, sys
@@ -8,6 +8,7 @@ import subprocess
 from AI_Model.agent import BrainAgent
 from AI_Model.log import log, init_log_queue, log_drain_loop
 from Visualizer.point_e_api_serve import main as point_e_main_server
+from GUI.py_web import main as gui_main
 
 
 VENV_DIR = Path(".venv")
@@ -43,38 +44,59 @@ def ensure_running_in_venv():
     sys.exit(0)
 
 
-def chat_loop():
+def chat_loop(parent_conn,shutdownEvent):
     agent = BrainAgent()
     log("Iniya online. Type 'exit' to quit.")
+    parent_conn.send({"event":"system","data":"online"})
 
     while True:
-        user = input("You: ")
-        if user.strip().lower() in {"exit", "quit"}:
-            agent.cleanup()
-            log("Iniya shutting down. Goodbye!")
-            break
+        msg = parent_conn.recv()
+        if msg["event"] == "message":
+            user = msg["data"]["content"]
+        elif msg["event"] == "system":
+            if msg["data"] == "shutdown":
+                agent.cleanup()
+                log("Iniya shutting down. Goodbye!")
+                shutdownEvent.set()
+                break
+        else:
+            continue 
+        if user:
+            start = time.perf_counter()
+            reply = agent.process(user)
+            elapsed = time.perf_counter() - start
+            user = ""
+            try: log(f"Cleaned Text: {reply['clean_text']}", "Text"); 
+            except: pass
 
-        start = time.perf_counter()
-        reply = agent.process(user)
-        elapsed = time.perf_counter() - start
-
-        try: log(f"Cleaned Text: {reply['clean_text']}", "Test"); 
-        except: pass
-
-        log(f"Iniya: {reply['text']}")
-        log(f"⏱ Time Taken:  {elapsed:.2f}s\n")
+            log(f"Iniya: {reply['text']}")
+            data = {
+                "type": "message",
+                "source": "python",
+                "fullReply":reply["text"],
+                "content": reply['clean_text']['raw'],
+                "timestamp":""
+            }
+            parent_conn.send({"event":"message","data":data})
+            log(f"⏱ Time Taken:  {elapsed:.2f}s\n")
 
 
 if __name__ == "__main__":
     ensure_running_in_venv()  
     freeze_support()  # REQUIRED on Windows
 
+    parent_conn , child_conn = Pipe()
+    flask_event = Event()
+    shutDown_event = Event()
     log_queue = Queue()
+
+
     init_log_queue(log_queue)  # Simple logging to console
 
     # Flask in separate process
     flask_proc = Process(
         target=point_e_main_server,
+        args=(flask_event,),
         daemon=True
     )
     flask_proc.start()
@@ -87,9 +109,16 @@ if __name__ == "__main__":
     )
     log_drain.start()
 
+    Process(target=gui_main, args=(child_conn,), daemon=True).start()
 
-    # Agent runs in MAIN THREAD
-    chat_loop()
+    print("Waiting for systems to be ready...")
+
+    flask_event.wait()
+
+    print("All systems ready. Starting chat.")
+
+    Thread(target=chat_loop,args=(parent_conn,shutDown_event),daemon=True).start()
+    shutDown_event.wait()
     log("Shutting down...", "SHUTDOWN")
 
     # Stop accepting logs

@@ -1,6 +1,30 @@
 <template>
   <div :class="styles.chatBoxContainer" @click="handleClick">
     <div :class="styles.chatHeader">
+      <div :class="styles.headerRow">
+        <div :class="styles.headerSide">
+          <div :class="styles.headerElement">
+            <Info :size="18"/>
+            <span>
+              Info
+            </span>
+          </div>
+        </div>
+        <div :class="styles.headerSide">
+          <div :class="styles.headerElement">
+            <FilePlus :size="18"/>
+            <span>
+              Files
+            </span>
+          </div>
+          <div :class="styles.headerElement">
+            <ImagePlus :size="18"/>
+            <span>
+              Images
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
     <div :class="styles.chatContent" ref="chatContent">
       <div :class="styles.chatInner" v-if="!newChat">
@@ -76,8 +100,7 @@
 <script setup>
   import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
   import styles from './chatBox.module.css'
-  import { Send, Plus, ImagePlus, FilePlus, Loader } from 'lucide-vue-next'
-
+  import { Send, Plus, ImagePlus, FilePlus, Loader, Info } from 'lucide-vue-next'
   const newChat = ref(true)
   const textarea = ref(null)
   const message = ref("")
@@ -148,9 +171,11 @@
       images: inputtedImages.value
     }
     messagesList.value.push(msg)
-    window.pywebview.api.sendQuestion(msg)
-    isWaitingForRply.value=true
-    autoScroll()
+    if (window.pywebview){
+      window.pywebview.api.sendQuestion(msg)
+      isWaitingForRply.value=true
+      autoScroll()
+    }
     message.value = ""
     inputtedFiles.value = []
     inputtedImages.value = []
@@ -256,7 +281,7 @@
   }
 
   onMounted(() => {
-    if (newChat.value) greeting.value = getGreeting({name:""})
+    if (newChat.value) greeting.value = getGreeting({name:"asd"})
 
     document.addEventListener('mousedown', handleClickOutside)
 
