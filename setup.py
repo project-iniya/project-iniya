@@ -2,10 +2,12 @@ import subprocess
 import sys
 from pathlib import Path
 import uuid
+import shutil
 
 
 VENV_DIR = Path(".venv")
 VENV_PYTHON = VENV_DIR / "Scripts" / "python.exe"
+UI_PATH = Path(__file__).resolve().parent / "GUI" / "ui_vue"
 
 
 def ensure_windows():
@@ -100,9 +102,10 @@ def main_setup():
     print("✅ Assets downloaded")
 
     # Bulding GUI dist File Using npm
+    npm = shutil.which("npm.cmd") or shutil.which("npm")
     subprocess.run(
-        ["npm", "run", "build"],
-        cwd="GUI/ui_vue",
+        [npm, "run", "build"],
+        cwd=UI_PATH,
         check=True
     )
     print("✅ GUI Built using NPM")
