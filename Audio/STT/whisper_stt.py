@@ -9,7 +9,7 @@ from pathlib import Path
 
 BASE_PATH = Path(__file__).parent.parent.parent
 
-CUDA_ROOT = r".\cuda\v12.9"
+CUDA_ROOT = r".\cuda\v13.0"
 CUDA_BIN  = os.path.join(BASE_PATH ,CUDA_ROOT, "bin")
 
 os.environ["CUDA_PATH"] = CUDA_ROOT

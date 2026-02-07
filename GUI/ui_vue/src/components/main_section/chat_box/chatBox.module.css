@@ -194,6 +194,48 @@
   white-space: pre-wrap;
 }
 
+.messageText h1,
+.messageText h2,
+.messageText h3 {
+  margin: 6px 0;
+  font-weight: 600;
+}
+
+.messageText p {
+  margin: 4px 0;
+}
+
+.messageText code {
+  background: rgba(255,255,255,0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.messageText pre {
+  background: #0d1117;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 6px 0;
+}
+
+.messageText a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.messageText ul {
+  padding-left: 18px;
+}
+
+.messageText blockquote {
+  border-left: 3px solid #444;
+  padding-left: 10px;
+  opacity: 0.8;
+}
+
+
 .timestamp {
   font-size: 10px;
   opacity: 0.6;

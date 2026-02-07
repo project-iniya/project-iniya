@@ -7,10 +7,11 @@ Contains default model settings and other configurations.
 # Not Finalized - you can choose your own preferred model here
 # DEFAULT_MODEL = "qwen2.5:7b-instruct-q4_0"
 # DEFAULT_MODEL = "qwen3-vl:4b-instruct-q4_K_M"
-DEFAULT_MODEL = "qwen3-vl:4b-thinking-q4_K_M"
+# DEFAULT_MODEL = "qwen3-vl:4b-thinking-q4_K_M"
+# DEFAULT_MODEL = "qwen3-vl:235b-cloud"
+# DEFAULT_MODEL = "qwen3-vl:235b-instruct-cloud"
+DEFAULT_MODEL = "qwen3-coder-next:cloud"
 
-#Cloud Models
-DEFAULT_CLOUD_MODEL = "qwen3-vl:235b-cloud"
 
 # Debug mode (enables logging and extra checks)
 DEBUG_MODE = True

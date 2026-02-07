@@ -42,9 +42,10 @@
               msg.source === 'user' ? styles.userBubble : styles.botBubble
             ]"
           >
-            <div :class="styles.messageText">
-              {{ msg.content }}
-            </div>
+            <div
+              :class="styles.messageText"
+              v-html="renderMarkdown(msg.content)"
+            ></div>
 
             <!-- attachments (optional) -->
             <div v-if="msg.images?.length" :class="styles.attachments">
@@ -101,6 +102,10 @@
   import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
   import styles from './chatBox.module.css'
   import { Send, Plus, ImagePlus, FilePlus, Loader, Info } from 'lucide-vue-next'
+  import MarkdownIt from "markdown-it"
+  import hljs from "highlight.js"
+  import "highlight.js/styles/github-dark.css"
+
   const newChat = ref(true)
   const textarea = ref(null)
   const message = ref("")
@@ -155,6 +160,28 @@
       const el = chatContent.value
       if (el) el.scrollTop = el.scrollHeight
     })
+  }
+
+  const md = new MarkdownIt({
+    html: false,        // safer (no raw HTML injection)
+    linkify: true,
+    typographer: true,
+    breaks: true,
+    highlight(code, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return `<pre class="hljs"><code>${
+            hljs.highlight(code, { language: lang }).value
+          }</code></pre>`
+        } catch (_) {}
+      }
+      return `<pre class="hljs"><code>${md.utils.escapeHtml(code)}</code></pre>`
+    }
+  })
+
+  function renderMarkdown(text) {
+    if (!text) return ""
+    return md.render(text)
   }
 
   function sendMSg() {

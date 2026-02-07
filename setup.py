@@ -101,8 +101,13 @@ def main_setup():
     )
     print("✅ Assets downloaded")
 
-    # Bulding GUI dist File Using npm
+    # Installing & Bulding GUI dist File Using npm
     npm = shutil.which("npm.cmd") or shutil.which("npm")
+    subprocess.run(
+        [npm, "install", "vite", "@vitejs/plugin-vue", "highlight.js", "lucide-vue-next", "markdown-it", "markdown-it-highlightjs", "vue"],
+        cwd=UI_PATH,
+        check=True
+    )
     subprocess.run(
         [npm, "run", "build"],
         cwd=UI_PATH,
