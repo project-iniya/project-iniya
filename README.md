@@ -34,12 +34,12 @@ python setup.py
 - ffmpeg, mpv for Audio
 - Nvidia GPU with Cuda for offline ollama models
 - Ollama Cloud model also Usable
-- Edit `AI_Model/llm_wrapper.py` To Change or Try/Test Models. Defualt Model is `qwen2.5:7b-instruct-q4_0`
+- Edit `AI_Model/llm_wrapper.py` To Change or Try/Test Models. Defualt Model is `qwen3-coder-next:cloud`
 - This is a Windows Only Project. No plans for adding Linux Support
 
 #### CUDA
 - This Project Contains Cuda Runtime DLLS which are a Property of Nvidia Coorporation
-- This Project Ships with Cuda runtime Dlls of verision v12.9 and v13.0
+- This Project Ships with Cuda runtime Dlls of verision v13.0
 
 #### HF Assets
 - The Assets such as Models, DLLS, Binaries are Hosted separately on Hugging Face as a Dataset
