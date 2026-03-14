@@ -1,18 +1,17 @@
-AI_Model/memory/
+memory_cache/
 __pycache__/
 cache/
 temp/
 .cache/
 
-.venv/
-.env
+.venv*/
+env
 skip
 *.log
 sample.*
 test.py
 test.txt
 extra
-
 
 sdf_encoding_checkpoints/
 sdf_dataset.json
@@ -26,6 +25,7 @@ cuda/
 poppler/
 
 # Logs
+log/
 logs
 *.log
 npm-debug.log*

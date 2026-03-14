@@ -1,0 +1,14 @@
+[
+  {
+    "name": "PROTOCOL SHUTDOWN",
+    "code": 17,
+    "command": "shutdown_system",
+    "authorization_required":true
+  },
+  {
+    "name": "PROTOCOL HELLO",
+    "code": 1,
+    "command": "say_hello",
+    "authorization_required":false
+  }
+]

@@ -114,13 +114,6 @@ def main_setup():
         check=True
     )
     print("✅ GUI Built using NPM")
-
-    #Creating First Chat
-    import AI_Model.config as aiconf
-    if aiconf.CURRENT_CHAT_ID: 
-        pass
-    else:
-        aiconf.CURRENT_CHAT_ID = str(uuid.uuid4())
   
 
 if __name__ == "__main__":

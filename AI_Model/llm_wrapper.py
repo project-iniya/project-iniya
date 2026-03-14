@@ -18,7 +18,7 @@ def ensure_model_available(model_name: str):
         log(f"Model '{model_name}' is available.", "LLM")
         return True
 
-    log(f"⚠ Model '{model_name}' NOT found.", "LLM")
+    log(f" Model '{model_name}' NOT found.", "LLM")
     return False
 
 
@@ -103,7 +103,7 @@ def preload_model(model: str = DEFAULT_MODEL, keep_alive: int = 3600):
         return True
 
     except Exception as e:
-        log(f"❌ Preload failed: {e}", "LLM")
+        log(f" Preload failed: {e}", "LLM")
         return False
 
 
@@ -127,7 +127,7 @@ def unload_model(model: str = DEFAULT_MODEL):
         return True
 
     except Exception as e:
-        log(f"❌ Failed to unload model '{model}': {e}", "LLM")
+        log(f" Failed to unload model '{model}': {e}", "LLM")
         return False
 
 
@@ -160,15 +160,15 @@ def unload_all_models():
                     prompt="",
                     keep_alive=0
                 )
-                log(f"✓ Unloaded: {model_name}", "LLM")
+                log(f" Unloaded: {model_name}", "LLM")
             except Exception as e:
-                log(f"✗ Failed to unload {model_name}: {e}", "LLM")
+                log(f" Failed to unload {model_name}: {e}", "LLM")
         
         log("All Ollama models unloaded", "LLM")
         return True
         
     except Exception as e:
-        log(f"❌ Error checking/unloading models: {e}", "LLM")
+        log(f" Error checking/unloading models: {e}", "LLM")
         return False
 
 

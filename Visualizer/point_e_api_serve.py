@@ -15,6 +15,7 @@ import gc
 import sys
 from multiprocessing import Queue
 from datetime import datetime
+from waitress import serve
 
 # Point-E imports
 from point_e.diffusion.configs import DIFFUSION_CONFIGS, diffusion_from_config
@@ -604,21 +605,15 @@ def generate():
 def main(ready_event=None):
     log("="*60, "SERVER")
     log("Starting Flask server on http://localhost:5000", "SERVER")
-    log("="*60, "SERVER")
     log("API Endpoints:", "SERVER")
     log("  GET  /api/health   - Health check", "SERVER")
     log("  POST /api/generate - Generate encoding from prompt", "SERVER")
-    log("", "SERVER")
-    log("VRAM Management:", "SERVER")
-    log("  - Point-E loads only when generating", "SERVER")
-    log("  - Ollama automatically unloaded during generation", "SERVER")
-    log("  - Ollama automatically reloaded after generation", "SERVER")
     log("="*60, "SERVER")
     
     if ready_event:
         ready_event.set()
 
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    serve(app, host="0.0.0.0", port=5000, threads=8)
 
 
 if __name__ == '__main__':

@@ -184,8 +184,11 @@
     return md.render(text)
   }
 
-  function sendMSg() {
+  async function sendMSg() {
     if (message.value.trim() === "") return
+
+    if (newChat.value)
+      await window.pywebview.api.change_chat({new:true, chatID:null})
 
     if (newChat.value) newChat.value = false
 

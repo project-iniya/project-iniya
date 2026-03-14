@@ -3,26 +3,25 @@ import base64
 from threading import Thread
 from pathlib import Path
 import json
+from AI_Model.log import log
+from AI_Model.memory.memory_chat import CurrentChatHistory
 
-BASE_DIR = Path(__file__).resolve().parent
-UPLOAD_DIR = BASE_DIR / "uploads"
-IMAGE_DIR = UPLOAD_DIR / "images"
-FILE_DIR = UPLOAD_DIR / "files"
-
-IMAGE_DIR.mkdir(parents=True, exist_ok=True)
-FILE_DIR.mkdir(parents=True, exist_ok=True)
-
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 class API:
     def __init__(self):
         self._window = None
         self._child_conn = None
+        self.chatManager = None
 
     def setWindow(self, window):
         self._window = window
     
     def setChildConn(self, conn):
         self._child_conn = conn
+
+    def setChatManager(self, chatID):
+        self.chatManager = CurrentChatHistory(chatID)
 
     def startLister(self):
         Thread(target=self.receiveReply, daemon=True).start()
@@ -34,47 +33,31 @@ class API:
         print(f"[FROM VUE] {msg}")
         return f"Python received: {msg}"
 
+    def change_chat(self, payload):
+        new = payload.get("new", False)
+        chatID = payload.get("chatID", None)
+        log(f"test0A {new}, {chatID} ")
+        if not (new or chatID):
+            return {"status": "error", "message": "ChatID not Present"}
+
+        self._child_conn.send({"event":"chatChange", "type":"text"} if new else {"event":"chatChange", "chatID": str(chatID)})
+        log("sent msg")
+        
+    def handle_change_chat_response(self, msg):
+      if msg["status"] == "success":
+          self.chatManager = CurrentChatHistory(msg["chatID"])
+          log(f"Chat Changed to {msg['chatID']}", "PYWEBVIEW INFO")
+      else :
+          log(f"Error : {msg['error']}", "PYWEBVIEW ERROR")
+
+    def read_chat_history(self,):
+        return self.chatManager.getChatHistory()
+
     def receive_image(self, payload):
-        """
-        Receives base64 image from Vue
-        """
-        try:
-            name = payload["name"]
-            data_url = payload["data"]
-
-            header, encoded = data_url.split(",", 1)
-            binary = base64.b64decode(encoded)
-
-            path = IMAGE_DIR / name
-            with open(path, "wb") as f:
-                f.write(binary)
-
-            print(f"[IMAGE SAVED] {path}")
-            return {"status": "ok", "path": str(path)}
-        except Exception as e:
-            print(f"[ERROR] {e}")
-            return {"status": "error", "message": str(e)}
+        return self.chatManager.saveImage(payload)
 
     def receive_file(self, payload):
-        """
-        Receives any file from Vue
-        """
-        try:
-            name = payload["name"]
-            data_url = payload["data"]
-
-            header, encoded = data_url.split(",", 1)
-            binary = base64.b64decode(encoded)
-
-            path = FILE_DIR / name
-            with open(path, "wb") as f:
-                f.write(binary)
-
-            print(f"[FILE SAVED] {path}")
-            return {"status": "ok", "path": str(path)}
-        except Exception as e:
-            print(f"[ERROR] {e}")
-            return {"status": "error", "message": str(e)}
+        return self.chatManager.saveFile(payload)
 
     def sendQuestion(self, payload):
         try:
@@ -89,9 +72,16 @@ class API:
             while True:
                 msg = self._child_conn.recv()
                 if msg["event"] == "message":
-                    self._window.evaluate_js(
-                        f"window.sendResponse({json.dumps(msg["data"])})"
-                    )
+                    fncUsed = msg.get("function_used")
+                    if not fncUsed:
+                      self._window.evaluate_js(
+                          f"window.sendResponse({json.dumps(msg["data"])})"
+                      )
+                    else:
+                        log(f"Functions used in response: {msg.get("data")}", "PYWEBVIEW INFO")
+                elif msg["event"] == "chatChange":
+                    self.handle_change_chat_response(msg)
+                  
         except Exception as e:
             data = {"status":"error","error":e}
             self._window.evaluate_js(
@@ -99,24 +89,29 @@ class API:
             )
 
 
-def main(child_conn):
-    UI_PATH = BASE_DIR / "ui_vue" / "dist" / "index.html"
+def main(child_conn = None):
+    UI_PATH = BASE_DIR / "GUI" / "ui_vue" / "dist" / "index.html"
 
-    api = API()
-    window = webview.create_window(
-        "My Vue App",
-        UI_PATH.as_uri(),
-        width=1200,
-        height=800,
-        js_api= api
-    )
-    api.setWindow(window)
-    api.setChildConn(child_conn)
-    api.startLister()
-    webview.start(debug=True)
-    child_conn.send({"event":"system", "data":"shutdown"})
+    if not child_conn :
+      print("Pipeline connection not provided!")
+
+    try:
+        api = API()
+        window = webview.create_window(
+            "Iniya",
+            UI_PATH.as_uri(),
+            width=1200,
+            height=800,
+            js_api= api,
+        )
+        api.setWindow(window)
+        api.setChildConn(child_conn)
+        api.startLister()
+        webview.start(debug=True)
+        child_conn.send({"event":"system", "data":"shutdown"})
+    except Exception as e :
+        print("WebView Expection:", e)
 
 
 if __name__ == "__main__":
-  
     main()

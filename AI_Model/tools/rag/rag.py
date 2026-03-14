@@ -32,14 +32,13 @@ from typing import List, Dict, Optional
 # Optional: Set your poppler path if needed
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 POPPLER_PATH = os.path.join(project_root, "poppler", "Library", "bin")
-sys.path.insert(0, project_root)
 
 from AI_Model.config import DEFAULT_MODEL as CHAT_MODEL  # Ensure this path is correct
 from AI_Model.config import CURRENT_CHAT_ID
 
 # Configuration
 EMBED_MODEL = "mxbai-embed-large"
-DB_PATH = f"AI_Model/memory/{CURRENT_CHAT_ID}/rag_memory"
+DB_PATH = f"AI_Model/memory_cache/{CURRENT_CHAT_ID}/rag_memory"
 
 # Chunk sizes - REDUCED to fit within model limits
 DEFAULT_CHUNK_SIZE = 400  # Reduced from 600

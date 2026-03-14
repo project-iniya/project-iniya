@@ -2,7 +2,6 @@
 Configuration file for AI Model settings.
 Contains default model settings and other configurations.
 """
-
 # Default Local model for your assistant (can be auto-switched later)
 # Not Finalized - you can choose your own preferred model here
 # DEFAULT_MODEL = "qwen2.5:7b-instruct-q4_0"
@@ -12,9 +11,20 @@ Contains default model settings and other configurations.
 # DEFAULT_MODEL = "qwen3-vl:235b-instruct-cloud"
 DEFAULT_MODEL = "qwen3-coder-next:cloud"
 
-
-# Debug mode (enables logging and extra checks)
 DEBUG_MODE = True
 
-# Chat ID 
-CURRENT_CHAT_ID="ae6e394c-8521-4d43-abdf-b0d34b891f78"
+class SharedState:
+    def __init__(self, manager):
+        self.data = manager.dict()
+
+    def set_chat(self, chat_id):
+        self.data["CURRENT_CHAT_ID"] = chat_id
+
+    def set_audio_mode(self, audio_mode):
+        self.data["AUDIO_MODE"] = audio_mode
+
+    def get_chat(self):
+        return self.data.get("CURRENT_CHAT_ID", None)
+    
+    def get_audio_mode(self):
+        return self.data.get("AUDIO_MODE", False)
