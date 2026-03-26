@@ -8,7 +8,7 @@ from AI_Model.memory.memory_tasks import TaskMemory
 from AI_Model.log import log
 from .scraper import scrape_url
 from AI_Model.tools.directives import protocol
-
+from .coding.coding_tools import CodingTools
 
 class ToolManager:
     def __init__(self,chatID, tavily_api_key: str | None = None):
@@ -17,9 +17,13 @@ class ToolManager:
         self.chatID = chatID
         self.tavily_api_key = tavily_api_key or os.getenv("TAVILY_API_KEY")
         self.tavily = TavilyClient(api_key=self.tavily_api_key)
+        
+        coding = CodingTools(self.chatID)
+        self.coding_protocols = coding.protocols
 
         # Tool registry (per-instance)
         self.tools = {
+            **coding.get_tools(),  
             "web_search": self.web_search,
             "web_scrape": scrape_url,
 
@@ -95,7 +99,10 @@ class ToolManager:
             if tool_input is None:
                 return tool()
             elif isinstance(tool_input, dict):
-                return tool(**tool_input)
+              try:
+                  return tool(tool_input)      # try dict-style first (coding tools)
+              except TypeError:
+                  return tool(**tool_input)    # fallback to kwargs (old tools)
             else:
                 return tool(tool_input)
         except Exception as e:

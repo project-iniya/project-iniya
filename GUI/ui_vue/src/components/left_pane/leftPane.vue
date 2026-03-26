@@ -46,9 +46,6 @@
         </button>
       </div>
     </div>
-    <button @click="changeChat">
-      Test Change Chat
-    </button>
     <div :class="styles.chatHistoryBlock" v-if="!collapsed">
       <div :class="styles.textChat">
         <div :class="styles.chatHistoryTitle">

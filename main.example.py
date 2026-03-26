@@ -2,7 +2,7 @@ from multiprocessing import Process, freeze_support, Queue, Pipe, Event, Manager
 import threading
 import time
 from pathlib import Path
-import sys
+import sys, io
 import subprocess
 
 from AI_Model.agent import BrainAgent
@@ -18,6 +18,8 @@ from GUI.py_web import main as gui_main
 VENV_DIR = Path(".venv")
 VENV_PYTHON = VENV_DIR / "Scripts" / "python.exe"
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 def ensure_running_in_venv():
     if sys.prefix.endswith(str(VENV_DIR)):
@@ -34,27 +36,15 @@ def ensure_running_in_venv():
 
 # ================= CHAT LOOP =================
 
-def receiver_thread(conn, gui_conn, stop_event, chatHistory):
-    while not stop_event.is_set():
-        if conn.poll(0.1):  # non-blocking check every 100ms
-            msg = conn.recv()
-            if msg and not msg.get("event") == "finalReply":
-                data = {"type": msg["event"], "source": "agent", "content": msg["data"]}
-                chatHistory.appendMsg(data)
-                gui_conn.send({"event": "message", "function_used":True, "data": data})
-            # handle incoming msg while agent is processing
-            # e.g. cancellation signal, etc.
-
-def chat_loop(state, conn, shutdown_event, main_chat_history):
-    msg_event_pipe = Pipe()
-    agent = BrainAgent(chatID=state.get_chat(), audio_mode=state.get_audio_mode(), msgConn=msg_event_pipe[1])
+def chat_loop(state, gui_info_pipeline_conn, gui_msg_pipeline_conn, shutdown_event, main_chat_history):
+    agent = BrainAgent(chatID=state.get_chat(), audio_mode=state.get_audio_mode(), msgConn=gui_msg_pipeline_conn)
     chatHistory = CurrentChatHistory(state.get_chat())
     log("Iniya online.")
 
-    conn.send({"event": "system", "data": "online"})
+    gui_info_pipeline_conn.send({"event": "system", "data": "online"})
 
     while not shutdown_event.is_set():
-        msg = conn.recv()
+        msg = gui_info_pipeline_conn.recv()
 
         if msg["event"] == "system" and msg["data"] == "shutdown":
             agent.cleanup()
@@ -68,7 +58,7 @@ def chat_loop(state, conn, shutdown_event, main_chat_history):
                         log(f"Failed to get chat info for ID {msg['chatID']}", "ERROR")
                         continue
                     state.set_chat(msg["chatID"])   
-                    agent = BrainAgent(chatID=state.get_chat(), audio_mode=chatInfo.get("type", "text"), msgConn=msg_event_pipe[1])
+                    agent = BrainAgent(chatID=state.get_chat(), audio_mode=chatInfo.get("type", "text"), msgConn=gui_msg_pipeline_conn)
                     chatHistory = CurrentChatHistory(state.get_chat())
                 else:
                     id = main_chat_history.addNewChat(type=msg.get("type", "text"))
@@ -77,9 +67,9 @@ def chat_loop(state, conn, shutdown_event, main_chat_history):
                         log(f"Failed to get chat info for new chat ID {id}", "ERROR")
                         continue
                     state.set_chat(id)
-                    agent = BrainAgent(chatID=state.get_chat(), audio_mode=chatInfo.get("type", "text"), msgConn=msg_event_pipe[1])
+                    agent = BrainAgent(chatID=state.get_chat(), audio_mode=chatInfo.get("type", "text"), msgConn=gui_msg_pipeline_conn)
                     chatHistory = CurrentChatHistory(state.get_chat())
-                conn.send({"event":"chatChange", "status":"success", "chatID": state.get_chat()})
+                gui_info_pipeline_conn.send({"event":"chatChange", "status":"success", "chatID": state.get_chat()})
             except Exception as e:
                 log(f"Error changing chat: {e}", "ERROR")
                 continue
@@ -90,17 +80,9 @@ def chat_loop(state, conn, shutdown_event, main_chat_history):
         user_input = msg["data"]["content"]
         if not user_input:
             continue
-
-        stop_event = threading.Event()
-        t = threading.Thread(target=receiver_thread, args=(msg_event_pipe[0], conn, stop_event,chatHistory), daemon=True)
-        t.start()
-
         start = time.perf_counter()
         reply = agent.process(user_input)
-        elapsed = time.perf_counter() - start
-
-        stop_event.set()  # signals thread to stop
-        t.join()          # wait for it to cleanly exit
+        elapsed = time.perf_counter() - start      # wait for it to cleanly exit
 
         try:
             log(f"Cleaned: {reply['clean_text']}", "TEXT")
@@ -109,7 +91,7 @@ def chat_loop(state, conn, shutdown_event, main_chat_history):
 
         log(f"Iniya: {reply['text']}")
         log(f"Uncertainty: {reply['uncertainty']}")
-        log(f"⏱ {elapsed:.2f}s\n")
+        log(f" {elapsed:.2f}s\n")
 
         data={
                 "type": "message",
@@ -121,11 +103,6 @@ def chat_loop(state, conn, shutdown_event, main_chat_history):
         
         chatHistory.appendMsg(msg["data"])
         chatHistory.appendMsg(data)
-
-        conn.send({
-            "event": "message",
-            "data": data
-        })
 
 
 # ================= MAIN =================
@@ -139,6 +116,7 @@ if __name__ == "__main__":
 
     # IPC
     gui_parent_conn, gui_child_conn = Pipe()
+    gui_msg_parent_conn, gui_msg_child_conn = Pipe()
 
     # Chat system
     main_chat_history = MainChatHistory()
@@ -168,7 +146,7 @@ if __name__ == "__main__":
     flask_proc.start()
 
     # GUI
-    Process(target=gui_main, args=(gui_child_conn,), daemon=True).start()
+    Process(target=gui_main, args=(gui_child_conn,gui_msg_child_conn), daemon=True).start()
 
     print("Waiting for systems...")
     flask_ready.wait()
@@ -177,7 +155,7 @@ if __name__ == "__main__":
     # Chat thread
     threading.Thread(
         target=chat_loop,
-        args=(state,gui_parent_conn, shutdown_event, main_chat_history),
+        args=(state,gui_parent_conn,gui_msg_parent_conn, shutdown_event, main_chat_history),
         daemon=True
     ).start()
 

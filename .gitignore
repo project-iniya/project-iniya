@@ -10,6 +10,7 @@ skip
 *.log
 sample.*
 test.py
+test_agent.py
 test.txt
 extra
 

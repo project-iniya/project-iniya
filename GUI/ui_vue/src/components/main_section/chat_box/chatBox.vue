@@ -1,5 +1,5 @@
 <template>
-  <div :class="styles.chatBoxContainer" @click="handleClick">
+  <div :class="styles.chatBoxContainer">
     <div :class="styles.chatHeader">
       <div :class="styles.headerRow">
         <div :class="styles.headerSide">
@@ -42,12 +42,85 @@
               msg.source === 'user' ? styles.userBubble : styles.botBubble
             ]"
           >
-            <div
-              :class="styles.messageText"
-              v-html="renderMarkdown(msg.content)"
-            ></div>
+            <!-- ── BOT MESSAGE ── -->
+            <template v-if="msg.source === 'bot'">
 
-            <!-- attachments (optional) -->
+              <!-- Step list -->
+              <div v-if="msg.steps?.length" :class="styles.stepList">
+                <div
+                  v-for="step in msg.steps"
+                  :key="step.id"
+                  :class="[
+                    styles.stepItem,
+                    step.failed ? styles.stepFailed :
+                    step.done   ? styles.stepDone   : styles.stepRunning,
+                    (step.input || step.result || step.fullDetail) ? styles.stepClickable : ''
+                  ]"
+                  @click="step.expanded = !step.expanded"
+                >
+                  <!-- Header row -->
+                  <div :class="styles.stepHeader">
+                    <Loader     v-if="!step.done && !step.failed" :size="14" :class="styles.spinning" />
+                    <XCircle    v-else-if="step.failed"           :size="14" :class="styles.stepError" />
+                    <CheckCheck v-else                            :size="14" :class="styles.stepCheck" />
+                    <span :class="styles.stepLabel">{{ step.label }}</span>
+                    <span v-if="step.attempt > 1" :class="styles.stepAttempt">#{{ step.attempt }}</span>
+                    <span v-if="step.detail && !step.expanded" :class="styles.stepDetail">{{ step.detail }}</span>
+                    <ChevronDown
+                      v-if="step.input || step.result || step.fullDetail"
+                      :size="12"
+                      :class="[styles.stepChevron, step.expanded ? styles.chevronOpen : '']"
+                    />
+                  </div>
+
+                  <!-- Expanded panel — sits below header -->
+                  <div v-if="step.expanded" :class="styles.stepExpanded">
+                    <div v-if="step.fullDetail">
+                      <span :class="styles.stepExpandLabel">Details</span>
+                      <p :class="styles.stepFullDetail">{{ step.fullDetail }}</p>
+                    </div>
+                    <div v-if="step.input">
+                      <span :class="styles.stepExpandLabel">Input</span>
+                      <pre :class="styles.stepCode">{{ step.input }}</pre>
+                    </div>
+                    <div v-if="step.result">
+                      <span :class="styles.stepExpandLabel">{{ step.failed ? 'Error' : 'Output' }}</span>
+                      <pre :class="styles.stepCode">{{ step.result }}</pre>
+                    </div>
+                    <div v-if="step.reason">
+                      <span :class="styles.stepExpandLabel">Failure reason</span>
+                      <pre :class="styles.stepCode">{{ step.reason }}</pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Divider between steps and final answer -->
+              <hr v-if="msg.steps?.length && msg.content" :class="styles.stepDivider" />
+
+              <!-- Typing indicator while pending and no content yet -->
+              <div v-if="msg.pending && !msg.content" :class="styles.typingDots">
+                <span /><span /><span />
+              </div>
+
+              <!-- Final response -->
+              <div
+                v-if="msg.content"
+                :class="styles.messageText"
+                v-html="renderMarkdown(msg.content)"
+              />
+
+            </template>
+
+            <!-- ── USER MESSAGE ── -->
+            <template v-else>
+              <div
+                :class="styles.messageText"
+                v-html="renderMarkdown(msg.content)"
+              />
+            </template>
+
+            <!-- Attachments -->
             <div v-if="msg.images?.length" :class="styles.attachments">
               <img
                 v-for="(img, i) in msg.images"
@@ -57,7 +130,7 @@
               />
             </div>
 
-            <div :class="styles.timestamp">
+            <div :class="styles.timestamp" v-if="msg.source === 'user' || (msg.source === 'bot' && !msg.pending)">
               {{ new Date(msg.timestamp).toLocaleTimeString() }}
             </div>
           </div>
@@ -101,7 +174,7 @@
 <script setup>
   import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
   import styles from './chatBox.module.css'
-  import { Send, Plus, ImagePlus, FilePlus, Loader, Info } from 'lucide-vue-next'
+  import { Send, Plus, ImagePlus, FilePlus, Loader, Info, CheckCheck, XCircle, ChevronDown } from 'lucide-vue-next'
   import MarkdownIt from "markdown-it"
   import hljs from "highlight.js"
   import "highlight.js/styles/github-dark.css"
@@ -163,7 +236,7 @@
   }
 
   const md = new MarkdownIt({
-    html: false,        // safer (no raw HTML injection)
+    html: false,
     linkify: true,
     typographer: true,
     breaks: true,
@@ -218,7 +291,6 @@
 
   function handleClickOutside(e) {
     if (!popupWrapper.value) return
-
     if (!popupWrapper.value.contains(e.target)) {
       isattachemntPopOpen.value = false
     }
@@ -246,7 +318,7 @@
         let res = await window.pywebview.api.receive_image({
           name: file.name,
           type: file.type,
-          data: reader.result // base64 DataURL
+          data: reader.result
         })
         if(res.status==='ok'){
           inputtedImages.value.push(res.path)
@@ -256,7 +328,6 @@
       reader.readAsDataURL(file)
     }
 
-    // reset so same file can be picked again
     e.target.value = ""
   }
 
@@ -270,7 +341,7 @@
       let res = await window.pywebview.api.receive_file({
         name: file.name,
         type: file.type,
-        data: reader.result // base64 DataURL
+        data: reader.result
       })
       if(res.status==='ok'){
         inputtedFiles.value.push(res.path)
@@ -278,8 +349,6 @@
     }
 
     reader.readAsDataURL(file)
-
-    // reset so same file can be picked again
     e.target.value = ""
   }
 
@@ -335,12 +404,92 @@
     document.removeEventListener('mousedown', handleClickOutside)
   })
 
-  window.sendResponse = function (payload){
+  // ── Python-callable window functions ──────────────────────────────────────
+
+  // Called once when bot starts responding — creates the pending bot message
+  window.startBotMessage = function () {
+    console.log("🤖 [startBotMessage] called")
+    const botMsg = {
+      source: 'bot',
+      timestamp: new Date().toISOString(),
+      steps: [],
+      content: null,
+      pending: true
+    }
+    messagesList.value.push(botMsg)
+    console.log("🤖 [startBotMessage] messagesList length:", messagesList.value.length)
+    autoScroll()
+  }
+
+  // Called for each tool/thinking step
+  window.addStep = function ({ label, detail = null, fullDetail = null, attempt = 1, input = null }) {
+    const msg = messagesList.value.at(-1)
+    if (!msg || msg.source !== 'bot') return
+    msg.steps.push({ 
+      label, detail, fullDetail: fullDetail || detail, attempt,
+      input: input ? JSON.stringify(input, null, 2) : null,
+      result: null,
+      done: false, failed: false,
+      expanded: false,
+      id: Date.now() 
+    })
+    autoScroll()
+  }
+
+  // Called to mark a step as complete
+  window.completeStep = function ({ label, result = null }) {
+    const msg = messagesList.value.at(-1)
+    if (!msg) return
+    const step = [...msg.steps].reverse().find(s => s.label === label && !s.done)
+    if (step) {
+      step.done = true
+      step.result = result
+    }
+  }
+
+  window.failStep = function ({ label, reason = null, result = null }) {
+    const msg = messagesList.value.at(-1)
+    if (!msg) return
+    // find last undone step with this label — don't push duplicate
+    const step = [...msg.steps].reverse().find(s => s.label === label && !s.done)
+    if (step) {
+      step.done = true
+      step.failed = true
+      step.reason = reason
+      step.result = result
+    }
+    // if already marked failed by toolDone, just update reason if missing
+    else {
+      const existing = [...msg.steps].reverse().find(s => s.label === label && s.failed)
+      if (existing && !existing.reason) existing.reason = reason
+    }
+    autoScroll()
+  }
+
+  // Called at the end with the final response text
+  window.finalizeResponse = function ({ content }) {
+    console.log("📩 [finalizeResponse] content:", content)
+    const msg = messagesList.value.at(-1)
+    if (!msg) {
+      console.warn("⚠️ [finalizeResponse] no last message found")
+      return
+    }
+    console.log("📩 [finalizeResponse] target msg:", msg)
+    msg.content = content
+    msg.pending = false
+    msg.timestamp = new Date().toISOString()
+    isWaitingForRply.value = false
+    autoScroll()
+  }
+
+  // Legacy fallback — simple response with no steps
+  window.sendResponse = function (payload) {
+    console.log("📨 [sendResponse] payload:", payload)
     payload.timestamp = new Date().toISOString()
-    console.log("📨 Event from Python:", payload)
+    payload.steps = payload.steps ?? []
+    payload.pending = false
     messagesList.value.push(payload)
-    console.log(messagesList.value)
-    isWaitingForRply.value=false
+    isWaitingForRply.value = false
     autoScroll()
   }
 </script>

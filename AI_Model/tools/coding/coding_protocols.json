@@ -1,0 +1,54 @@
+{
+  "file_read": {
+    "description": "Read the contents of a file in the workspace.",
+    "input": {
+      "path": "string — relative path inside workspace, e.g. 'src/main.py'"
+    },
+    "returns": "{ status, path, content, lines } or { status, error }"
+  },
+
+  "file_write": {
+    "description": "Write or create a file in the workspace. Creates parent directories automatically.",
+    "input": {
+      "path": "string — relative path, e.g. 'src/utils.py'",
+      "content": "string — full file content to write",
+      "overwrite": "bool (optional, default true) — set false to prevent overwriting"
+    },
+    "returns": "{ status, path, bytes } or { status, error }"
+  },
+
+  "file_list": {
+    "description": "List files and directories inside a workspace folder.",
+    "input": {
+      "path": "string — relative path to list, use '.' for workspace root"
+    },
+    "returns": "{ status, path, entries: [{ name, type, size }] }"
+  },
+
+  "file_delete": {
+    "description": "Delete a single file from the workspace. Cannot delete directories.",
+    "input": {
+      "path": "string — relative path to the file"
+    },
+    "returns": "{ status, deleted } or { status, error }"
+  },
+
+  "code_run": {
+      "description": "PREFERRED tool for running scripts. Use 'inputs' list to pass stdin — never use shell piping for this. Supports .py, .js, .ts, .sh, .rb files.",
+      "input": {
+          "path": "string — relative path, e.g. 'average.py'",
+          "inputs": "list of strings — stdin lines in order. For 3 input() calls pass ['10', '20', '30']",
+          "stdin": "string (optional) — raw stdin block alternative"
+      },
+      "returns": "{ status, exit_code, stdout, stderr } or { status, error }"
+  },
+
+  "shell_exec": {
+      "description": "Run a shell command. On Windows: use 'python' not 'python3', use 'dir' not 'ls', use '(echo a & echo b) | python script.py' for stdin piping. Avoid 'echo -e'.",
+      "input": {
+          "command": "string — shell command",
+          "cwd": "string (optional) — subdirectory, default '.'"
+      },
+      "returns": "{ status, exit_code, stdout, stderr } or { status, error }"
+  }
+}

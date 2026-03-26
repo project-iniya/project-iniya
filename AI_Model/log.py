@@ -1,3 +1,4 @@
+import io
 import sys
 from multiprocessing import Queue
 from typing import Optional
@@ -9,6 +10,8 @@ from .config import DEBUG_MODE as DEBUG
 # Global log queue (optional)
 LOG_QUEUE: Optional[Queue] = None
 
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
 def init_log_queue(queue: Optional[Queue]):
     """
