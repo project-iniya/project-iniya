@@ -5,7 +5,7 @@ temp/
 .cache/
 
 .venv*/
-env
+.env
 skip
 *.log
 sample.*
