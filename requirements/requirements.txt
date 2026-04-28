@@ -29,3 +29,6 @@ rapidfuzz
 pywebview
 waitress
 pythonnet
+vosk
+ctranslate2
+keyring

@@ -9,7 +9,6 @@ from AI_Model.agent import BrainAgent
 from AI_Model.memory.memory_chat import MainChatHistory, CurrentChatHistory
 from AI_Model.config import SharedState
 from AI_Model.log import log, init_log_queue, log_drain_loop
-from Visualizer.point_e_api_serve import main as point_e_main_server
 from GUI.py_web import main as gui_main
 
 
@@ -137,14 +136,6 @@ if __name__ == "__main__":
     )
     log_thread.start()
 
-    # Flask (Point-E server)
-    flask_proc = Process(
-        target=point_e_main_server,
-        args=(flask_ready,),
-        daemon=True
-    )
-    flask_proc.start()
-
     # GUI
     Process(target=gui_main, args=(gui_child_conn,gui_msg_child_conn), daemon=True).start()
 
@@ -165,12 +156,5 @@ if __name__ == "__main__":
     # Stop logging
     log_stop_event.set()
     log_thread.join(timeout=2)
-
-    # Stop Flask
-    flask_proc.terminate()
-    flask_proc.join(timeout=2)
-
-    if flask_proc.is_alive():
-        log("Flask did not exit cleanly", "SHUTDOWN")
 
     print("Shutdown complete.")

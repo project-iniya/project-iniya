@@ -11,12 +11,10 @@ from AI_Model.tools.directives import protocol
 from .coding.coding_tools import CodingTools
 
 class ToolManager:
-    def __init__(self,chatID, tavily_api_key: str | None = None):
+    def __init__(self,chatID):
         load_dotenv()
         self.task_memory = TaskMemory(chatID)
         self.chatID = chatID
-        self.tavily_api_key = tavily_api_key or os.getenv("TAVILY_API_KEY")
-        self.tavily = TavilyClient(api_key=self.tavily_api_key)
         
         coding = CodingTools(self.chatID)
         self.coding_protocols = coding.protocols
@@ -41,7 +39,8 @@ class ToolManager:
         log(f"🔍 Tavily search: {query}")
 
         try:
-            result = self.tavily.search(
+            tvly = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
+            result = tvly.search(
                 query=query,
                 include_answer=True,
                 max_results=max_results,
@@ -53,7 +52,7 @@ class ToolManager:
         # Direct answer from Tavily
         if result.get("answer"):
             log({result["answer"]})
-            return f"📌 {result['answer']}"
+            return f"{result['answer']}"
 
         items = result.get("results", [])
         log(f"Found {len(items)} results.", "TOOLS")
